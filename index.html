@@ -930,7 +930,26 @@
 
   </div>
 
-  <section id="radio-mini-player" class="radio-mini-player" aria-label="Radio player" hidden>
+  <section id="song-now-playing" class="song-now-playing" aria-label="Now playing" aria-hidden="true">
+    <header class="song-now-header">
+      <button id="song-player-close" type="button" aria-label="Minimize player">⌄</button>
+      <span>NOW PLAYING</span>
+      <button id="song-player-queue" type="button" aria-label="Your music">♫</button>
+    </header>
+    <div class="song-now-art-wrap"><div id="song-now-art" class="mini-art art-0"><span>♫</span></div></div>
+    <div class="song-now-heading"><div><h1 id="song-now-title">Song title</h1><p id="song-now-artist">Artist</p></div><button id="song-now-like" type="button" aria-label="Like song">♡</button></div>
+    <div class="song-now-lyrics"><span>LYRICS</span><p id="song-now-lyrics-copy">Lyrics are not available for this song yet.</p></div>
+    <div class="song-now-progress"><div class="song-now-times"><span id="song-now-current">0:00</span><span id="song-now-duration">0:00</span></div><input id="song-now-seek" type="range" min="0" max="1000" value="0" aria-label="Seek song"></div>
+    <div class="song-now-controls">
+      <button id="song-now-shuffle" type="button" aria-label="Shuffle">⤨</button>
+      <button id="song-now-previous" type="button" aria-label="Previous song">|◀</button>
+      <button id="song-now-play" type="button" aria-label="Pause">Ⅱ</button>
+      <button id="song-now-next" type="button" aria-label="Next song">▶|</button>
+      <button id="song-now-repeat" type="button" aria-label="Repeat">↻</button>
+    </div>
+    <section class="song-now-info"><h2>Song info</h2><dl><dt>Album</dt><dd id="song-now-album">Single</dd><dt>Artist</dt><dd id="song-now-artist-info">Artist</dd><dt>Genre</dt><dd id="song-now-genre">Not specified</dd><dt>Release</dt><dd id="song-now-release">Not specified</dd></dl></section>
+  </section>
+\n  <section id="radio-mini-player" class="radio-mini-player" aria-label="Radio player" hidden>
     <div class="radio-mini-live" aria-hidden="true"><span></span></div>
     <div class="radio-mini-copy">
       <small id="radio-mini-status">LIVE · PLAYING</small>

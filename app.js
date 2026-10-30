@@ -2968,6 +2968,10 @@
     if (shouldPlay) {
       elements.playerBar.hidden = false;
       document.body.classList.add("has-player");
+      if (window.matchMedia("(max-width: 760px)").matches) {
+        elements.songNowPlaying.classList.add("is-open");
+        elements.songNowPlaying.setAttribute("aria-hidden", "false");
+      }
     }
     audio.src = track.url;
     audio.preload = getAudioPreload();

@@ -2847,7 +2847,7 @@
       updatePlayer();
       render();
       elements.playButton.textContent = "Ⅱ";
-      elements.songNowPlay.textContent = "Ⅱ";
+      elements.songNowPlay.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>';
       elements.songNowPlay.setAttribute("aria-label", "Pause");
       elements.playButton.setAttribute("aria-label", "Pause");
       elements.playButton.title = "Pause";
@@ -4085,7 +4085,7 @@
       if (player !== audio) return;
       if (crossfadeInProgress) stopCrossfade();
       elements.playButton.textContent = "▶";
-      elements.songNowPlay.textContent = "▶";
+      elements.songNowPlay.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>';
       elements.songNowPlay.setAttribute("aria-label", "Play");
       elements.playButton.setAttribute("aria-label", "Play");
       elements.playButton.title = "Play";

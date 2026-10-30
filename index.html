@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Lox-Muzik — your personal space to listen to and download music." />
+  <meta name="theme-color" content="#140529" />
+  <title>Lox-Muzik — your music, your space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=mobile-search-overlay" />
+</head>
+
+<body>
+  <div class="auth-page" id="auth-page">
+    <div class="auth-card">
+      <div class="auth-brand" aria-label="Lox-Muzik login">
+        <img class="brand-logo" src="LOX-MUZIK_4000px_square.png" alt="" />
+      </div>
+      <p id="auth-kicker" class="auth-kicker">Log in</p>
+      <h1 id="auth-title">Choose how you want to use Lox-Muzik.</h1>
+      <p id="auth-description" class="auth-description">Listeners can enjoy music and live radio. Creators also get
+        upload, station, and audience tools.</p>
+
+      <div class="account-type-picker" role="group" aria-label="Choose an account type">
+        <button class="account-type-card is-selected" data-account-type="listener" type="button" aria-pressed="true">
+          <span class="account-type-icon" aria-hidden="true">♫</span>
+          <strong>Listener</strong>
+          <small>Music and radio</small>
+        </button>
+        <button class="account-type-card" data-account-type="creator" type="button" aria-pressed="false">
+          <span class="account-type-icon" aria-hidden="true">✦</span>
+          <strong>Creator</strong>
+          <small>Publish and grow</small>
+        </button>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <label class="field">
+          <span>Email or username</span>
+          <input type="text" name="email" autocomplete="username" placeholder="Email or username" required />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" autocomplete="current-password" placeholder="Password" required />
+        </label>
+
+        <button class="primary-button auth-submit" type="submit">Continue as listener</button>
+      </form>
+
+      <p class="signup-text">
+        <span id="signup-copy">New to Lox-Muzik?</span>
+        <button id="signup-toggle" class="text-link inline-text" type="button">Create an account</button>
+      </p>
+    </div>
+  </div>
+
+  <div class="app-shell app-shell-hidden" id="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#" aria-label="Lox-Muzik home">
+        <img class="brand-logo" src="LOX-MUZIK_4000px_square.png" alt="" />
+        <span>LOX<span class="brand-dash">-</span>MUZIK</span>
+      </a>
+
+      <div id="library-nav-group" class="nav-group">
+        <p class="nav-label">Library</p>
+        <button class="nav-link" data-view="playlists" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 5.5h11M4 9.5h11M4 13.5h6" />
+              <path d="M16 3.5v11.2a2.3 2.3 0 1 1-1.6-2.2V6l6-1.5v8.2a2.3 2.3 0 1 1-1.6-2.2V3.5z" />
+            </svg></span> Playlist
+        </button>
+        <button class="nav-link" data-view="artists" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 20v-1.5a5.5 5.5 0 0 1 11 0V20zM16 5.5a3 3 0 0 1 0 5.8M17 14a4.5 4.5 0 0 1 3.5 4.4V20h-3" />
+            </svg></span> Artists
+        </button>
+        <button class="nav-link" data-view="songs" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 18V5l10-2v13" />
+              <circle cx="7" cy="18" r="3" />
+              <circle cx="17" cy="16" r="3" />
+            </svg></span> Songs
+        </button>
+        <button class="nav-link" data-view="albums" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 3a9 9 0 0 1 9 9" />
+            </svg></span> Albums / EP
+        </button>
+        <button class="nav-link" data-view="downloads" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
+              <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+            </svg></span> Downloads
+        </button>
+      </div>
+
+      <div id="creator-nav-group" class="nav-group creator-nav-group" hidden>
+        <p class="nav-label">Creator</p>
+        <button id="creator-nav-link" class="nav-link creator-nav-link" data-view="creator" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8z" />
+              <path d="m19 2 .8 2.2L22 5l-2.2.8L19 8l-.8-2.2L16 5l2.2-.8z" />
+            </svg></span> Creator Studio
+        </button>
+        <button class="nav-link creator-nav-link" data-view="profile" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.2" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg></span> Artist Profile
+        </button>
+        <button class="nav-link creator-nav-link" data-view="downloads" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
+              <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+            </svg></span> Downloads
+        </button>
+      </div>
+
+      <div class="nav-group discover-group">
+        <p id="discover-nav-label" class="nav-label">Discover</p>
+        <button id="trends-nav-link" class="nav-link" data-view="trends" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 17.5 9 12l3.5 3.5L20 7.5" />
+              <path d="M14.5 7.5H20V13" />
+              <path d="M3 20h18" />
+            </svg></span> Trends
+        </button>
+        <button class="nav-link" data-view="radio" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="18" r="1.5" />
+              <path
+                d="M12 16V4M8.5 7.5a5 5 0 0 0 0 7M15.5 7.5a5 5 0 0 1 0 7M5.5 4.5a9 9 0 0 0 0 13M18.5 4.5a9 9 0 0 1 0 13M9 21h6" />
+            </svg></span> Radio
+        </button>
+        <button class="nav-link" data-view="browse" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+            </svg></span> Browse
+        </button>
+        <button id="menu-login-button" class="nav-link login-nav-link" type="button">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.2" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg></span> Log in
+        </button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div id="playlist-links" class="playlist-links" aria-label="Your playlists"></div>
+        <button class="outline-button" data-scroll-song-form type="button">
+          <span aria-hidden="true">＋</span> Add a song
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <a class="brand mobile-brand" href="#" aria-label="Lox-Muzik home">
+          <img class="brand-logo" src="LOX-MUZIK_4000px_square.png" alt="" />
+          <span>LOX<span class="brand-dash">-</span>MUZIK</span>
+        </a>
+        <div id="search-container" class="search-container">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="search-input" type="search" placeholder="Search songs, artists, albums, mixes or radio"
+              autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false"
+              aria-controls="search-results" />
+            <kbd>/</kbd>
+          </label>
+          <div id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></div>
+        </div>
+        <div class="topbar-actions" aria-label="Account and preferences">
+          <button id="settings-button" class="topbar-icon-button" type="button" aria-label="Settings" title="Settings"
+            aria-expanded="false" aria-controls="settings-view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.2" />
+              <path
+                d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 2.94-.09-.02a1.7 1.7 0 0 0-1.79.35l-.07.06h-3.4l-.03-.09a1.7 1.7 0 0 0-1.3-1.17 1.7 1.7 0 0 0-1.75.58l-.06.07-2.94-1.7.02-.09a1.7 1.7 0 0 0-.35-1.79l-.06-.07v-3.4l.09-.03a1.7 1.7 0 0 0 1.17-1.3 1.7 1.7 0 0 0-.58-1.75l-.07-.06 1.7-2.94.09.02a1.7 1.7 0 0 0 1.79-.35l.07-.06h3.4l.03.09a1.7 1.7 0 0 0 1.3 1.17 1.7 1.7 0 0 0 1.75-.58l.06-.07 2.94 1.7-.02.09a1.7 1.7 0 0 0 .35 1.79l.06.07v3.4l-.09.03a1.7 1.7 0 0 0-1.17 1.3Z"
+                transform="translate(-1.1 -1.1) scale(1.09)" />
+            </svg>
+          </button>
+          <button id="notifications-button" class="topbar-icon-button notification-button" type="button"
+            aria-label="Notifications" title="Notifications" aria-expanded="false" aria-controls="notifications-panel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+              <path d="M10 21h4" />
+            </svg>
+            <span id="notification-count" class="notification-count" hidden></span>
+          </button>
+          <button id="top-login-button" class="icon-button profile-button" type="button" aria-label="Log in"
+            title="Log in">
+            <svg class="profile-button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.3" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
+            <span class="profile-button-label">Log in</span>
+          </button>
+        </div>
+        <section id="notifications-panel" class="topbar-popover notifications-panel" hidden role="region"
+          aria-labelledby="notifications-title">
+          <div class="topbar-popover-heading">
+            <div>
+              <p class="eyebrow">YOUR AUDIENCE</p>
+              <h2 id="notifications-title">Notifications</h2>
+            </div><span id="notification-status" class="notification-clear-state">CREATOR ONLY</span>
+          </div>
+          <div id="notifications-empty" class="notification-empty-state"><span aria-hidden="true">♬</span><strong>Log in
+              as a creator</strong>
+            <p>Likes on your songs and new followers will appear here when you log in to your Creator account.</p>
+          </div>
+          <div id="notifications-list" class="notification-list" aria-live="polite" hidden></div>
+        </section>
+      </header>
+
+      <section id="settings-view" class="settings-page" hidden aria-labelledby="settings-title">
+        <div class="settings-page-heading">
+          <button id="settings-back" class="artist-action-button settings-back" type="button">← Back</button>
+          <div>
+            <p class="eyebrow section-eyebrow">PREFERENCES</p>
+            <h1 id="settings-title">Settings</h1>
+            <p>Make Lox-Muzik work the way you like.</p>
+          </div>
+        </div>
+        <div class="settings-page-grid">
+          <section class="settings-group settings-account-group" aria-labelledby="settings-account-title">
+            <h2 id="settings-account-title" class="settings-group-title">Account</h2>
+            <div class="settings-account-card">
+              <span id="settings-account-avatar" class="settings-account-avatar" aria-hidden="true">♫</span>
+              <span class="settings-account-copy"><strong id="settings-account-name">Not signed in</strong><small
+                  id="settings-account-email">Sign in to view your account</small></span>
+              <span id="settings-account-role" class="settings-account-role">Guest</span>
+            </div>
+          </section>
+          <section class="settings-group" aria-labelledby="settings-security-title">
+            <h2 id="settings-security-title" class="settings-group-title">Security</h2>
+            <p class="settings-help-copy">This demo does not store passwords or connect to a remote account service.
+              Delete account removes this profile’s local creator details and signs you out.</p>
+            <button id="delete-account-button" class="settings-danger-button" type="button" disabled>Delete
+              account</button>
+          </section>
+          <section class="settings-group" aria-labelledby="settings-appearance-title">
+            <h2 id="settings-appearance-title" class="settings-group-title">Appearance</h2>
+            <label class="setting-select" for="color-theme-select">
+              <span><strong>Color theme</strong><small>Choose the Lox-Muzik colors or black &amp; white.</small></span>
+              <select id="color-theme-select">
+                <option value="dark">Lox-Muzik dark</option>
+                <option value="monochrome">Black &amp; white</option>
+              </select>
+            </label>
+          </section>
+          <section class="settings-group" aria-labelledby="settings-playback-title">
+            <h2 id="settings-playback-title" class="settings-group-title">Playback</h2>
+            <label class="setting-volume" for="settings-volume">
+              <span>Playback volume <output id="settings-volume-value" for="settings-volume">80%</output></span>
+              <input id="settings-volume" type="range" min="0" max="1" step="0.01" value="0.8" />
+            </label>
+            <label class="setting-toggle" for="crossfade-toggle"><span><strong>Crossfade</strong><small>Blend songs
+                  together with a <span id="crossfade-seconds-copy">5</span>-second overlap.</small></span><input
+                id="crossfade-toggle" type="checkbox" /></label>
+            <label class="setting-range" for="crossfade-duration">
+              <span>Crossfade duration <output id="crossfade-duration-value" for="crossfade-duration">5
+                  sec</output></span>
+              <input id="crossfade-duration" type="range" min="1" max="12" step="1" value="5" />
+            </label>
+            <label class="setting-select" for="audio-quality-select">
+              <span><strong>Audio quality</strong><small>Tracks play at their original source quality; Data saver
+                  reduces preloading.</small></span>
+              <select id="audio-quality-select">
+                <option value="original">Original source</option>
+                <option value="data-saver">Data saver</option>
+              </select>
+            </label>
+            <label class="setting-select" for="sound-effect-select">
+              <span><strong>Sound effect</strong><small>Choose how overlapping songs blend together.</small></span>
+              <select id="sound-effect-select">
+                <option value="none">Linear</option>
+                <option value="soft">Smooth</option>
+                <option value="strong">Equal power</option>
+              </select>
+            </label>
+            <label class="setting-select" for="playback-speed-select">
+              <span><strong>Playback speed</strong><small>Adjust the speed of music playback.</small></span>
+              <select id="playback-speed-select">
+                <option value="0.75">0.75×</option>
+                <option value="0.9">0.9×</option>
+                <option value="1" selected>Normal</option>
+                <option value="1.1">1.1×</option>
+                <option value="1.25">1.25×</option>
+                <option value="1.5">1.5×</option>
+                <option value="2">2×</option>
+              </select>
+            </label>
+            <label class="setting-toggle" for="autoplay-next-toggle"><span><strong>Autoplay next</strong><small>Continue
+                  with the next song when one ends.</small></span><input id="autoplay-next-toggle"
+                type="checkbox" /></label>
+            <label class="setting-select" for="repeat-mode-select">
+              <span><strong>Repeat</strong><small>Choose what happens at the end of a queue.</small></span>
+              <select id="repeat-mode-select">
+                <option value="off">Off</option>
+                <option value="all">Repeat queue</option>
+                <option value="one">Repeat song</option>
+              </select>
+            </label>
+          </section>
+          <section class="settings-group" aria-labelledby="settings-accessibility-title">
+            <h2 id="settings-accessibility-title" class="settings-group-title">Accessibility</h2>
+            <label class="setting-toggle" for="reduce-motion-toggle"><span><strong>Reduce motion</strong><small>Pause
+                  moving effects and slides.</small></span><input id="reduce-motion-toggle" type="checkbox" /></label>
+            <label class="setting-toggle" for="screen-lock-toggle"><span><strong>Keep screen
+                  awake</strong><small>Prevent screen sleep while music or radio is playing, when
+                  supported.</small></span><input id="screen-lock-toggle" type="checkbox" /></label>
+          </section>
+        </div>
+      </section>
+
+      <section id="release-view" class="release-view" hidden aria-labelledby="release-title">
+        <div id="release-hero" class="release-hero art-2">
+          <div class="release-hero-gallery" aria-hidden="true">
+            <img src="imgs/release-hero-1.jpg" alt="" />
+            <img src="imgs/release-hero-2.jpg" alt="" />
+            <img src="imgs/release-hero-3.jpg" alt="" />
+          </div>
+          <div class="release-hero-copy">
+            <p id="release-eyebrow" class="eyebrow">YOUR LIBRARY</p>
+            <h1 id="release-title">Songs</h1>
+            <p id="release-description"></p>
+            <div class="release-hero-actions">
+              <button id="release-play-all" class="artist-play-button" type="button">▶ Play all</button>
+              <button id="release-shuffle" class="release-shuffle-button" type="button">⤨ Shuffle</button>
+            </div>
+          </div>
+          <div id="release-hero-art" class="release-hero-art" aria-hidden="true"><span
+              id="release-hero-art-label">♫</span></div>
+        </div>
+        <div class="release-overview" aria-label="Music library summary">
+          <span><strong id="release-count">0</strong><small id="release-count-label">songs</small></span>
+          <span><strong id="release-artist-count">0</strong><small>artists</small></span>
+          <span><strong id="release-duration">0:00</strong><small>total time</small></span>
+        </div>
+        <div class="release-toolbar">
+          <div id="song-filters" class="song-filters" aria-label="Filter songs">
+            <button class="song-filter is-active" data-release-filter="all" type="button" aria-pressed="true">All
+              songs</button>
+            <button class="song-filter" data-release-filter="albums" type="button" aria-pressed="false">Albums</button>
+            <button class="song-filter" data-release-filter="singles" type="button"
+              aria-pressed="false">Singles</button>
+            <button class="song-filter" data-release-filter="mixes" type="button" aria-pressed="false">Mix
+              tapes</button>
+          </div>
+          <div class="song-taxonomy-filters" aria-label="Filter songs by category and genre">
+            <label><span>Category</span><select id="song-category-filter" aria-label="Filter by category">
+                <option value="all">All categories</option>
+              </select></label>
+            <label><span>Genre</span><select id="song-genre-filter" aria-label="Filter by genre">
+                <option value="all">All genres</option>
+              </select></label>
+          </div>
+          <span id="release-results-label"></span>
+        </div>
+        <div id="release-grid" class="release-grid" aria-live="polite"></div>
+        <div id="release-empty" class="release-empty" hidden>
+          <span aria-hidden="true">♫</span>
+          <h2 id="release-empty-title">Your music starts here</h2>
+          <p id="release-empty-copy">Add songs to your collection to see them here.</p>
+          <button class="artist-play-button" data-scroll-song-form type="button">＋ Add a song</button>
+        </div>
+      </section>
+
+      <section id="downloads-view" class="downloads-view" hidden aria-labelledby="downloads-title">
+        <div class="downloads-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">YOUR OFFLINE LIBRARY</p>
+            <h1 id="downloads-title">Downloads</h1>
+            <p>Songs saved on this device are ready to play offline.</p>
+          </div>
+          <span id="downloads-count" class="downloads-count">0 songs</span>
+        </div>
+        <div id="downloads-list" class="downloads-list" aria-live="polite"></div>
+        <div id="downloads-empty" class="downloads-empty">
+          <span aria-hidden="true">↓</span>
+          <h2>No offline songs yet</h2>
+          <p>Log in, choose “Save to Offline Downloads” from a song’s download options, and it will be ready to play
+            here.</p>
+          <button class="artist-action-button" data-view="songs" type="button">Browse songs</button>
+        </div>
+      </section>
+
+      <section id="artists-view" class="artists-view" hidden aria-labelledby="artists-view-title">
+        <div id="artists-directory">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow section-eyebrow">LIBRARY</p>
+              <h2 id="artists-view-title">Artists</h2>
+            </div>
+          </div>
+          <div class="artist-library-overview">
+            <p id="artist-library-message"></p>
+            <div class="artist-library-stats" aria-label="Artist library summary">
+              <span><strong id="artist-library-count">0</strong> artists</span>
+              <span><strong id="artist-library-song-count">0</strong> songs</span>
+              <span><strong id="artist-library-following-count">0</strong> following</span>
+            </div>
+          </div>
+          <div id="artists-grid" class="artists-grid" aria-live="polite"></div>
+        </div>
+        <div id="artist-detail" class="artist-detail" hidden>
+          <div class="artist-detail-header">
+            <button id="artist-back" class="artist-back" type="button" aria-label="Back to all artists">←</button>
+            <div class="artist-detail-header-title">Artist</div>
+            <div class="artist-detail-header-actions" aria-label="Artist actions">
+              <button class="artist-header-icon" type="button" aria-label="Like artist">♡</button>
+              <button class="artist-header-icon" type="button" aria-label="More options">•••</button>
+            </div>
+          </div>
+          <div id="artist-hero" class="artist-hero art-0">
+            <div class="artist-hero-copy">
+              <p class="eyebrow">ARTIST</p>
+              <h1 id="artist-detail-name"></h1>
+              <p class="artist-hero-meta"><span id="artist-hero-genre">Pop</span> • <span
+                  id="artist-hero-tag">Electronic</span> • <span id="artist-hero-listeners">2.4M</span> monthly
+                listeners</p>
+            </div>
+          </div>
+          <div class="artist-profile-bar">
+            <div class="artist-stats" aria-label="Artist likes and followers">
+              <button type="button" class="artist-stat-pill"><span class="artist-stat-icon"
+                  aria-hidden="true">◉</span><strong id="artist-like-count">0</strong><span>followers</span></button>
+              <button type="button" class="artist-stat-pill"><span class="artist-stat-icon"
+                  aria-hidden="true">♬</span><strong id="artist-song-count">0</strong><span>songs</span></button>
+              <button type="button" class="artist-stat-pill"><span class="artist-stat-icon"
+                  aria-hidden="true">▣</span><strong id="artist-follower-count">0</strong><span>albums</span></button>
+            </div>
+            <div class="artist-profile-actions">
+              <button id="artist-like-button" class="artist-action-button" type="button">♡ Like</button>
+              <button id="artist-follow-button" class="artist-action-button" type="button">＋ Follow</button>
+              <button id="artist-play-all" class="artist-play-button" type="button">▶ Shuffle Play</button>
+            </div>
+          </div>
+
+          <div class="artist-main-layout">
+            <div class="artist-popular-panel">
+              <div class="artist-songs-heading">
+                <h2>Popular</h2>
+                <button class="artist-see-all" type="button">See all <span id="artist-track-total">42</span></button>
+              </div>
+              <div id="artist-track-list" class="artist-track-list" aria-live="polite"></div>
+            </div>
+
+            <section class="artist-albums-panel" aria-labelledby="artist-albums-title">
+              <div class="artist-songs-heading artist-albums-heading">
+                <h2 id="artist-albums-title">Albums</h2>
+                <button class="artist-see-all" type="button">See all <span>12</span></button>
+              </div>
+              <div id="artist-album-grid" class="artist-album-grid" aria-live="polite"></div>
+            </section>
+          </div>
+
+          <section class="artist-about" aria-labelledby="artist-about-title" hidden>
+            <div id="artist-about-art" class="artist-about-art art-0" aria-hidden="true">
+              <span id="artist-about-initials"></span>
+            </div>
+            <div class="artist-about-copy">
+              <p class="eyebrow">ARTIST STORY</p>
+              <h2 id="artist-about-title"></h2>
+              <p id="artist-about-text"></p>
+              <div class="artist-about-actions">
+                <button id="artist-about-like" class="artist-action-button" type="button">♡ Like</button>
+                <button id="artist-about-follow" class="artist-action-button" type="button">＋ Follow</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="radio-view" class="radio-view" hidden aria-labelledby="radio-view-title">
+        <div class="radio-page-heading">
+          <p class="eyebrow section-eyebrow">LIVE FROM GHANA</p>
+          <h1 id="radio-view-title">Radio stations</h1>
+          <p>Listen to live music, news, and shows from stations across Ghana.</p>
+        </div>
+        <section id="radio-now-playing" class="radio-now-playing" hidden aria-label="Current radio station">
+          <div class="radio-live-indicator"><span aria-hidden="true"></span><strong id="radio-live-status">Choose a
+              station</strong></div>
+          <div class="radio-now-copy">
+            <small>ON AIR</small>
+            <strong id="radio-now-title">No station selected</strong>
+            <span id="radio-now-details"></span>
+          </div>
+          <div class="radio-now-controls">
+            <button id="radio-toggle-button" class="artist-play-button" type="button">▶ Listen live</button>
+            <button id="radio-stop-button" class="artist-action-button" type="button">Stop</button>
+            <label class="radio-volume-control" for="radio-volume">Volume
+              <input id="radio-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Radio volume" />
+            </label>
+          </div>
+        </section>
+        <div id="radio-stations-grid" class="radio-stations-grid" aria-label="Live radio stations"></div>
+        <p id="radio-search-empty" class="radio-search-empty" hidden>No radio stations match your search.</p>
+        <p class="radio-source-note">Live streams come from their broadcasters and may vary by region or availability.
+        </p>
+        <section class="creator-panel radio-add-station" aria-labelledby="radio-add-station-title">
+          <div class="creator-panel-heading">
+            <div>
+              <p class="eyebrow">BROADCAST</p>
+              <h2 id="radio-add-station-title">Add your radio station</h2>
+            </div>
+          </div>
+          <p class="creator-note">Share your station with listeners. Adding a station requires a Creator account and a
+            direct public audio stream URL.</p>
+          <form id="creator-radio-form" class="creator-radio-form">
+            <label class="field"><span>Station name</span><input name="stationName" placeholder="My Radio"
+                maxlength="60" required /></label>
+            <label class="field"><span>Location</span><input name="stationLocation" placeholder="Accra, Ghana · Online"
+                maxlength="80" required /></label>
+            <label class="field"><span>Station format</span><input name="stationFormat"
+                placeholder="Music · Talk · News" maxlength="80" required /></label>
+            <label class="field creator-stream-field"><span>Live stream URL</span><input name="streamUrl" type="url"
+                placeholder="https://your-station.example/stream" required /></label>
+            <button class="artist-play-button" type="submit">＋ Add station</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="creator-view" class="creator-view" hidden aria-labelledby="creator-view-title">
+        <div class="creator-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">YOUR CREATOR SPACE</p>
+            <h1 id="creator-view-title">Creator Studio</h1>
+            <p>Upload songs, add a radio station, and follow your audience activity.</p>
+          </div>
+          <button class="artist-play-button" data-scroll-song-form type="button">＋ Add a song</button>
+        </div>
+
+        <div class="creator-stats" aria-label="Creator account overview">
+          <article class="creator-stat-card"><span>Uploaded songs</span><strong id="creator-song-count">0</strong>
+          </article>
+          <article class="creator-stat-card"><span>Song likes</span><strong id="creator-like-count">0</strong></article>
+          <article class="creator-stat-card"><span>Followers</span><strong id="creator-follower-count">0</strong>
+          </article>
+          <article class="creator-stat-card"><span>Your stations</span><strong id="creator-station-count">0</strong>
+          </article>
+        </div>
+
+        <section id="creator-upload-panel" class="creator-panel creator-upload-panel"
+          aria-labelledby="creator-upload-title">
+          <div class="creator-panel-heading">
+            <div>
+              <p class="eyebrow">PUBLISH MUSIC</p>
+              <h2 id="creator-upload-title">Add a song</h2>
+            </div>
+          </div>
+          <p class="creator-note creator-upload-intro">Choose an audio file, add the song details, then publish it to
+            your catalog.</p>
+          <form id="creator-song-form" class="creator-song-form">
+            <label class="field creator-upload-audio-field">
+              <span>Audio file <b aria-hidden="true">*</b></span>
+              <input id="creator-audio-file" name="audioFile" type="file"
+                accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.m4a,.ogg,.flac"
+                required aria-describedby="creator-audio-help" />
+              <small id="creator-audio-help">MP3, WAV, M4A, OGG, or FLAC. Add one song per upload.</small>
+            </label>
+            <label class="field">
+              <span>Song title <b aria-hidden="true">*</b></span>
+              <input id="creator-song-title" name="title" maxlength="100" placeholder="Enter the song title" required />
+            </label>
+            <label class="field">
+              <span>Artist name <b aria-hidden="true">*</b></span>
+              <input id="creator-song-artist" name="artist" maxlength="60" placeholder="Your artist name" required
+                aria-describedby="creator-artist-help" />
+              <small id="creator-artist-help">For collaborations, separate artist names with “feat.”, commas, or &amp;.
+                The song will appear on each artist’s page.</small>
+            </label>
+            <label class="field">
+              <span>Release type</span>
+              <select name="releaseType">
+                <option value="single">Single</option>
+                <option value="album">Album / EP</option>
+                <option value="mix">DJ Mix Tape / Mix Tape</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Genre</span>
+              <select name="genre">
+                <option value="auto">Auto-detect from artist and file</option>
+                <option value="Afrobeats">Afrobeats</option>
+                <option value="Afropop">Afropop</option>
+                <option value="Highlife">Highlife</option>
+                <option value="Hiplife">Hiplife</option>
+                <option value="Amapiano">Amapiano</option>
+                <option value="Dancehall">Dancehall</option>
+                <option value="Reggae">Reggae</option>
+                <option value="Gospel">Gospel</option>
+                <option value="Hip-Hop &amp; Rap">Hip-hop &amp; Rap</option>
+                <option value="R&amp;B / Soul">R&amp;B / Soul</option>
+                <option value="Pop">Pop</option>
+                <option value="Electronic / Dance">Electronic / Dance</option>
+                <option value="Rock / Alternative">Rock / Alternative</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Other">Other</option>
+              </select>
+              <small>Choose a genre or let Lox-Muzik sort it automatically.</small>
+            </label>
+            <label class="field creator-upload-cover-field">
+              <span>Cover image <small>(optional)</small></span>
+              <input id="creator-cover-file" name="coverFile" type="file"
+                accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" aria-describedby="creator-cover-help" />
+              <small id="creator-cover-help">If omitted, embedded cover art is used; otherwise your artist image
+                appears.</small>
+            </label>
+            <button class="artist-play-button creator-song-submit" type="submit">＋ Publish song</button>
+          </form>
+        </section>
+
+        <section class="creator-panel" aria-labelledby="creator-profile-title">
+          <div class="creator-panel-heading">
+            <div>
+              <p class="eyebrow">PUBLIC PROFILE</p>
+              <h2 id="creator-profile-title">Your artist page</h2>
+            </div>
+          </div>
+          <p class="creator-note">Add a bio, location, genres, and website to your artist profile. You can update these
+            details any time.</p>
+          <div class="creator-public-profile-summary">
+            <span class="creator-public-profile-avatar" aria-hidden="true">
+              <img id="creator-studio-profile-photo" alt="" hidden />
+              <span id="creator-studio-profile-initials">♫</span>
+            </span>
+            <span>
+              <strong id="creator-studio-profile-name">Your artist name</strong>
+              <small>Profile photo and details appear on your artist page.</small>
+            </span>
+          </div>
+          <button class="artist-action-button" data-view="profile" type="button">Edit artist profile</button>
+        </section>
+
+        <section class="creator-panel" aria-labelledby="creator-radio-title">
+          <div class="creator-panel-heading">
+            <div>
+              <p class="eyebrow">BROADCAST</p>
+              <h2 id="creator-radio-title">Add your radio station</h2>
+            </div>
+          </div>
+          <p class="creator-note">Add a radio station from the Radio page. Your station will appear in the Radio
+            directory on this device.</p>
+          <button class="artist-action-button" data-view="radio" type="button">Go to Radio</button>
+        </section>
+
+        <section class="creator-panel creator-trending-panel" aria-labelledby="creator-trending-title">
+          <div class="creator-panel-heading">
+            <div>
+              <p class="eyebrow">AUDIENCE ACTIVITY</p>
+              <h2 id="creator-trending-title">Your trending songs</h2>
+            </div>
+          </div>
+          <p class="creator-note">Listener activity updates this list automatically. Downloads count for 3 points, plays
+            for 2, and searches for 1. Songs with the most activity appear first.</p>
+          <div id="creator-trending-list" class="creator-track-list" aria-live="polite"></div>
+          <p id="creator-trending-empty" class="creator-empty-copy">New uploads are tracked automatically and appear
+            here when listeners start playing, searching for, or downloading them.</p>
+        </section>
+
+        <section class="creator-panel creator-songs-panel" aria-labelledby="creator-songs-title">
+          <div class="creator-panel-heading">
+            <div>
+              <p class="eyebrow">YOUR CATALOG</p>
+              <h2 id="creator-songs-title">Your songs</h2>
+            </div>
+          </div>
+          <div id="creator-track-list" class="creator-track-list"></div>
+          <p id="creator-empty-copy" class="creator-empty-copy">Your uploaded songs will appear here after you add them.
+          </p>
+        </section>
+      </section>
+
+      <section id="artist-profile-view" class="artist-profile-view" hidden aria-labelledby="artist-profile-page-title">
+        <div class="artist-profile-page-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">ARTIST PROFILE</p>
+            <h1 id="artist-profile-page-title">Artist profile</h1>
+            <p>Update your artist details and preview how your page will look to listeners.</p>
+          </div>
+          <span class="profile-visibility-badge"><span aria-hidden="true">●</span> Profile preview</span>
+        </div>
+        <div class="artist-profile-layout">
+          <section class="artist-profile-preview creator-panel" aria-labelledby="artist-profile-preview-title">
+            <div class="artist-profile-cover">
+              <span class="artist-profile-avatar" aria-hidden="true">
+                <img id="artist-profile-avatar-photo" alt="" hidden />
+                <span id="artist-profile-avatar-initials">♫</span>
+              </span>
+              <div class="artist-profile-preview-heading">
+                <p class="eyebrow">ARTIST</p>
+                <h2 id="artist-profile-preview-title">Your artist name</h2>
+                <p id="artist-profile-preview-location" class="artist-profile-location" hidden></p>
+              </div>
+            </div>
+            <p id="artist-profile-preview-bio" class="artist-profile-bio">Add a short bio to introduce yourself to
+              listeners.</p>
+            <div id="artist-profile-preview-genres" class="artist-profile-genres" hidden></div>
+            <a id="artist-profile-preview-website" class="artist-profile-website" target="_blank"
+              rel="noopener noreferrer" hidden></a>
+            <div class="artist-profile-stats" aria-label="Artist profile stats">
+              <div><strong id="artist-profile-song-count">0</strong><span>Songs</span></div>
+              <div><strong id="artist-profile-like-count">0</strong><span>Likes</span></div>
+              <div><strong id="artist-profile-follower-count">0</strong><span>Followers</span></div>
+            </div>
+            <p class="artist-profile-preview-note">Profile preview for this browser.</p>
+          </section>
+          <section class="creator-panel artist-profile-editor" aria-labelledby="artist-profile-editor-title">
+            <div class="creator-panel-heading">
+              <div>
+                <p class="eyebrow">PROFILE DETAILS</p>
+                <h2 id="artist-profile-editor-title">Edit your details</h2>
+              </div>
+            </div>
+            <form id="creator-profile-form" class="artist-profile-form">
+              <label class="field"><span>Artist or creator name</span><input id="creator-display-name"
+                  name="creatorName" maxlength="60" required /></label>
+              <div class="profile-photo-field">
+                <label class="field" for="creator-profile-photo">
+                  <span>Profile photo</span>
+                  <input id="creator-profile-photo" name="profilePhoto" type="file"
+                    accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    aria-describedby="creator-profile-photo-help" />
+                  <small id="creator-profile-photo-help">Choose a JPG, PNG, or WebP image up to 8 MB.</small>
+                </label>
+                <button id="creator-profile-photo-remove" class="artist-action-button" type="button">Remove
+                  photo</button>
+              </div>
+              <label class="field"><span>About you</span><textarea id="creator-profile-bio" name="bio" maxlength="500"
+                  rows="5" placeholder="Tell listeners about your sound, story, and latest work."></textarea></label>
+              <div class="artist-profile-field-grid">
+                <label class="field"><span>Location</span><input id="creator-profile-location" name="location"
+                    maxlength="80" placeholder="Accra, Ghana" /></label>
+                <label class="field"><span>Genres</span><input id="creator-profile-genres" name="genres" maxlength="100"
+                    placeholder="Afrobeats, Highlife" /></label>
+              </div>
+              <label class="field"><span>Website</span><input id="creator-profile-website" name="website" type="url"
+                  maxlength="200" placeholder="https://yourwebsite.com" /></label>
+              <button class="artist-play-button" type="submit">Save profile</button>
+              <p class="artist-profile-editor-note">Your profile and new uploads are saved to this browser on this
+                device.</p>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section id="browse-view" class="browse-view" hidden aria-labelledby="browse-view-title">
+        <section id="home-welcome-hero" class="home-welcome-hero" data-slide="0" aria-labelledby="browse-view-title">
+          <div class="home-welcome-copy">
+            <p id="welcome-kicker" class="eyebrow">WELCOME TO</p>
+            <h1 id="browse-view-title">Lox-Muzik</h1>
+            <p id="welcome-description">Your home for the best music, trending sounds, artists and more.</p>
+            <button id="welcome-action" class="welcome-action-button" type="button">▶ Start Listening</button>
+          </div>
+          <div id="welcome-slide-dots" class="welcome-slide-dots" role="group" aria-label="Welcome slides">
+            <button class="welcome-slide-dot is-active" type="button" data-welcome-slide="0"
+              aria-label="Show welcome slide 1 of 3" aria-pressed="true"></button>
+            <button class="welcome-slide-dot" type="button" data-welcome-slide="1"
+              aria-label="Show welcome slide 2 of 3" aria-pressed="false"></button>
+            <button class="welcome-slide-dot" type="button" data-welcome-slide="2"
+              aria-label="Show welcome slide 3 of 3" aria-pressed="false"></button>
+          </div>
+        </section>
+        <nav class="browse-shortcuts" aria-label="Browse music categories">
+          <button class="browse-shortcut" data-browse-target="trending-section" type="button"><span
+              aria-hidden="true">↗</span><strong>Trending</strong><small>What listeners are playing</small></button>
+          <button class="browse-shortcut" data-browse-target="popular-artists-section" type="button"><span
+              aria-hidden="true">♟</span><strong>Artists</strong><small>Find a new favorite</small></button>
+          <button class="browse-shortcut" data-browse-target="popular-releases-section" type="button"><span
+              aria-hidden="true">▣</span><strong>Releases</strong><small>Albums and singles</small></button>
+          <button class="browse-shortcut" data-browse-target="popular-radio-section" type="button"><span
+              aria-hidden="true">◉</span><strong>Radio</strong><small>Listen live</small></button>
+        </nav>
+      </section>
+
+      <section id="likes-view" class="likes-view" hidden aria-labelledby="likes-view-title">
+        <div class="likes-page-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">YOUR COLLECTION</p>
+            <h1 id="likes-view-title">Likes &amp; Following</h1>
+            <p>Your favorite songs and the artists you follow, together in one place.</p>
+          </div>
+        </div>
+        <div class="likes-overview">
+          <article class="likes-overview-card"><span>Liked songs</span><strong id="liked-song-count">0</strong>
+          </article>
+          <article class="likes-overview-card"><span>Artists following</span><strong
+              id="followed-artist-count">0</strong></article>
+        </div>
+        <div class="likes-content-grid">
+          <section class="likes-panel" aria-labelledby="liked-songs-title">
+            <div class="likes-panel-heading">
+              <div>
+                <p class="eyebrow">SAVED MUSIC</p>
+                <h2 id="liked-songs-title">Liked songs</h2>
+              </div>
+            </div>
+            <div id="liked-songs-list" class="liked-songs-list" aria-live="polite"></div>
+            <div id="liked-songs-empty" class="likes-empty-state"><span aria-hidden="true">♡</span>
+              <p>Like a song to save it here.</p><button class="artist-action-button" data-view="browse"
+                type="button">Browse music</button>
+            </div>
+          </section>
+          <section class="likes-panel" aria-labelledby="followed-artists-title">
+            <div class="likes-panel-heading">
+              <div>
+                <p class="eyebrow">YOUR ARTISTS</p>
+                <h2 id="followed-artists-title">Following</h2>
+              </div>
+            </div>
+            <div id="followed-artists-grid" class="followed-artists-grid" aria-live="polite"></div>
+            <div id="followed-artists-empty" class="likes-empty-state"><span aria-hidden="true">♟</span>
+              <p>Follow an artist to keep them close.</p><button class="artist-action-button" data-view="artists"
+                type="button">Find artists</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="popular-artists-section" class="popular-artists-section" aria-labelledby="popular-artists-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">DISCOVER</p>
+            <h2 id="popular-artists-title">Popular artists</h2>
+          </div>
+        </div>
+        <div id="popular-artists-grid" class="popular-artists-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="trending-section" class="trending-section" aria-labelledby="trending-title">
+        <div class="section-heading">
+          <div>
+            <h1 id="trending-title">Trends</h1>
+          </div>
+        </div>
+        <div class="trending-stage">
+          <div id="trending-grid" class="trending-grid" aria-live="polite"></div>
+          <button class="carousel-button carousel-previous" id="trending-previous" type="button"
+            aria-label="Previous trending songs" title="Previous">‹</button>
+          <button class="carousel-button carousel-next" id="trending-next" type="button"
+            aria-label="Next trending songs" title="Next">›</button>
+        </div>
+        <section class="trend-chart" aria-labelledby="trend-chart-title">
+          <div class="trend-chart-heading">
+            <div>
+              <p class="eyebrow">YOUR MUSIC COLLECTION</p>
+              <h2 id="trend-chart-title">Everyday song, just for you</h2>
+              <p id="trend-chart-description">Your songs are grouped by their credited artists.</p>
+            </div>
+            <span class="trend-chart-live"><span class="live-dot" aria-hidden="true"></span><span
+                id="trend-chart-status">YOUR MUSIC</span></span>
+          </div>
+          <div id="trend-chart-list" class="trend-chart-list"></div>
+          <button id="trend-chart-more" class="text-link trend-chart-more" type="button" hidden>View more ↓</button>
+        </section>
+      </section>
+
+      <section id="popular-releases-section" class="popular-releases-section" aria-labelledby="popular-releases-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">FAN FAVORITES</p>
+            <h2 id="popular-releases-title">Popular albums &amp; singles</h2>
+          </div>
+        </div>
+        <div id="popular-releases-grid" class="discovery-card-row" aria-label="Popular albums and singles"></div>
+      </section>
+
+      <section id="popular-radio-section" class="popular-radio-section" aria-labelledby="popular-radio-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">LIVE BROADCASTS</p>
+            <h2 id="popular-radio-title">Radio stations</h2>
+          </div>
+        </div>
+        <div id="popular-radio-grid" class="discovery-card-row" aria-label="Live Ghana radio stations"></div>
+      </section>
+
+      <section class="made-for-you-section" aria-labelledby="made-for-you-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">DAILY ARTIST PICKS</p>
+            <h2 id="made-for-you-title">Made for you</h2>
+            <p class="made-for-you-intro">Fresh artists and songs, picked for today.</p>
+          </div>
+        </div>
+        <div id="made-for-you-cards" class="made-for-you-cards" aria-label="Today's artist picks"></div>
+      </section>
+
+      <section class="played-history-section" aria-labelledby="played-history-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">YOUR LISTENING HISTORY</p>
+            <h2 id="played-history-title">Recently played</h2>
+          </div>
+        </div>
+        <div id="played-history-grid" class="played-history-grid" aria-live="polite"></div>
+        <div id="played-history-empty" class="recent-empty">
+          <span aria-hidden="true">♫</span>
+          <p>Songs you play will show up here.</p>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <section class="player-bar" aria-label="Music player" hidden>
+    <div class="now-playing">
+      <div class="mini-art art-0" id="player-art" aria-hidden="true"><span>♫</span></div>
+      <div class="now-playing-copy">
+        <strong id="player-title">Nothing playing yet</strong>
+        <span id="player-artist">Add a track to get started</span>
+      </div>
+      <button id="like-button" class="player-like" type="button" aria-label="Like this song" title="Like this song"
+        disabled>♡</button>
+    </div>
+    <div class="player-controls">
+      <div class="control-buttons">
+        <button id="previous-button" class="control-button secondary-control" type="button" aria-label="Previous track"
+          title="Previous track">|◀</button>
+        <button id="play-button" class="play-button" type="button" aria-label="Play" title="Play" disabled>▶</button>
+        <button id="next-button" class="control-button secondary-control" type="button" aria-label="Next track"
+          title="Next track">▶|</button>
+        <button id="download-button" class="control-button download-control" type="button"
+          aria-label="Download current track" title="Download current track" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v11m0 0 4-4m-4 4-4-4" />
+            <path d="M5 16v4h14v-4" />
+          </svg>
+        </button>
+      </div>
+      <div class="progress-row">
+        <span id="current-time">0:00</span>
+        <input id="progress" type="range" min="0" max="1000" value="0" aria-label="Track progress" />
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+    <div class="volume-control">
+      <span aria-hidden="true">◖</span>
+      <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" />
+      <span aria-hidden="true">◗</span>
+    </div>
+  </section>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button class="mobile-nav-link is-active" data-view="browse" type="button"><span aria-hidden="true"><svg
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
+        </svg></span>Home</button>
+    <button class="mobile-nav-link" data-view="radio" type="button"><span aria-hidden="true"><svg viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="18" r="1.5" />
+          <path
+            d="M12 16V4M8.5 7.5a5 5 0 0 0 0 7M15.5 7.5a5 5 0 0 1 0 7M5.5 4.5a9 9 0 0 0 0 13M18.5 4.5a9 9 0 0 1 0 13M9 21h6" />
+        </svg></span>Radio</button>
+    <button class="mobile-nav-link" data-focus-search type="button" aria-controls="search-container"
+      aria-expanded="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10.8" cy="10.8" r="6.8" />
+          <path d="m16 16 5 5" />
+        </svg></span>Search</button>
+    <button class="mobile-nav-link" data-view="downloads" type="button"><span aria-hidden="true"><svg
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
+          <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+        </svg></span>Downloads</button>
+    <button id="mobile-creator-nav" class="mobile-nav-link" data-view="creator" type="button" hidden><span
+        aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8z" />
+        </svg></span>Studio</button>
+    <button id="mobile-profile-nav" class="mobile-nav-link" data-view="profile" type="button" hidden><span
+        aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.2" />
+          <path d="M5 20a7 7 0 0 1 14 0" />
+        </svg></span>Profile</button>
+  </nav>
+
+  <audio id="audio-player" preload="metadata"></audio>
+  <audio id="crossfade-audio" preload="auto"></audio>
+  <audio id="radio-audio" preload="none"></audio>
+  <dialog id="download-destination-dialog" class="download-destination-dialog"
+    aria-labelledby="download-destination-title">
+    <div class="download-destination-content">
+      <p class="eyebrow section-eyebrow">SAVE YOUR MUSIC</p>
+      <h2 id="download-destination-title">Where should we save this song?</h2>
+      <p id="download-destination-track" class="download-destination-track"></p>
+      <button id="download-to-device" class="download-destination-option" type="button">
+        <span class="download-destination-icon" aria-hidden="true">↓</span>
+        <span><strong>Save to device</strong><small>Download a copy to your device. Your browser chooses where it is
+            saved.</small></span>
+      </button>
+      <button id="download-to-library" class="download-destination-option" type="button">
+        <span class="download-destination-icon" aria-hidden="true">♫</span>
+        <span><strong>Save to Offline Downloads</strong><small>Keep it in Lox-Muzik so you can play it here, even
+            offline.</small></span>
+      </button>
+      <button id="cancel-download-destination" class="download-destination-cancel" type="button">Cancel</button>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
+  <script src="songs/catalog.js"></script>
+  <script src="app.js?v=mobile-search-overlay"></script>
+</body>
+
+</html>

@@ -477,6 +477,19 @@
     duration: document.querySelector("#duration"),
     volume: document.querySelector("#volume"),
     toast: document.querySelector("#toast"),
+    songNowPlaying: document.querySelector("#song-now-playing"),
+    songNowArt: document.querySelector("#song-now-art"),
+    songNowTitle: document.querySelector("#song-now-title"),
+    songNowArtist: document.querySelector("#song-now-artist"),
+    songNowArtistInfo: document.querySelector("#song-now-artist-info"),
+    songNowAlbum: document.querySelector("#song-now-album"),
+    songNowGenre: document.querySelector("#song-now-genre"),
+    songNowRelease: document.querySelector("#song-now-release"),
+    songNowLike: document.querySelector("#song-now-like"),
+    songNowPlay: document.querySelector("#song-now-play"),
+    songNowCurrent: document.querySelector("#song-now-current"),
+    songNowDuration: document.querySelector("#song-now-duration"),
+    songNowSeek: document.querySelector("#song-now-seek"),
   };
   const savedPlaybackVolume = Number(readStoredValue("loxMuzikPlaybackVolume", 0.8));
   const initialPlaybackVolume = Number.isFinite(savedPlaybackVolume)
@@ -2755,6 +2768,16 @@
     applyTrackArtwork(elements.playerArt, track);
     elements.playerTitle.textContent = track.title;
     elements.playerArtist.textContent = track.artist;
+    elements.songNowArt.className = `mini-art art-${track.art}`;
+    applyTrackArtwork(elements.songNowArt, track);
+    elements.songNowTitle.textContent = track.title;
+    elements.songNowArtist.textContent = track.artist;
+    elements.songNowArtistInfo.textContent = track.artist;
+    elements.songNowAlbum.textContent = track.album || (track.releaseType === "album" ? "Album" : "Single");
+    elements.songNowGenre.textContent = track.genre || track.genres?.join(", ") || "Not specified";
+    elements.songNowRelease.textContent = track.releaseYear || track.year || "Not specified";
+    elements.songNowLike.textContent = isTrackLiked(track) ? "♥" : "♡";
+    elements.songNowDuration.textContent = formatTime(track.duration || audio.duration);
     const trackIsLiked = isTrackLiked(track);
     elements.likeButton.textContent = trackIsLiked ? "♥" : "♡";
     elements.likeButton.classList.toggle("is-liked", trackIsLiked);
@@ -2824,6 +2847,8 @@
       updatePlayer();
       render();
       elements.playButton.textContent = "Ⅱ";
+      elements.songNowPlay.textContent = "Ⅱ";
+      elements.songNowPlay.setAttribute("aria-label", "Pause");
       elements.playButton.setAttribute("aria-label", "Pause");
       elements.playButton.title = "Pause";
       updateScreenWakeLock();
@@ -3889,6 +3914,33 @@
     });
   });
   elements.playButton.addEventListener("click", togglePlayback);
+  document.querySelector("#song-player-close").addEventListener("click", () => {
+    elements.songNowPlaying.classList.remove("is-open");
+    elements.songNowPlaying.setAttribute("aria-hidden", "true");
+  });
+  document.querySelector("#song-now-play").addEventListener("click", togglePlayback);
+  document.querySelector("#song-now-previous").addEventListener("click", () => moveTrack(-1));
+  document.querySelector("#song-now-next").addEventListener("click", () => moveTrack(1));
+  elements.songNowLike.addEventListener("click", () => {
+    const track = currentTrack();
+    if (!track) return;
+    toggleTrackLike(track);
+    updatePlayer();
+    render();
+  });
+  elements.songNowSeek.addEventListener("input", () => {
+    if (Number.isFinite(audio.duration) && audio.duration > 0) audio.currentTime = (Number(elements.songNowSeek.value) / 1000) * audio.duration;
+  });
+  document.querySelector("#song-now-repeat").addEventListener("click", () => {
+    repeatModeSelect.value = repeatModeSelect.value === "off" ? "all" : repeatModeSelect.value === "all" ? "one" : "off";
+    writeStoredValue("loxMuzikRepeatMode", repeatModeSelect.value);
+    showToast(`Repeat: ${repeatModeSelect.value}`);
+  });
+  document.querySelector("#song-now-shuffle").addEventListener("click", () => {
+    const ids = getReleaseTracks().map((track) => track.id);
+    for (let i = ids.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+    if (ids.length) selectTrack(ids[0], true, ids);
+  });
   document.querySelector("#previous-button").addEventListener("click", () => moveTrack(-1));
   document.querySelector("#next-button").addEventListener("click", () => moveTrack(1));
   elements.downloadButton.addEventListener("click", () => requestDownloadDestination(currentTrack()));
@@ -4029,6 +4081,8 @@
       if (player !== audio) return;
       if (crossfadeInProgress) stopCrossfade();
       elements.playButton.textContent = "▶";
+      elements.songNowPlay.textContent = "▶";
+      elements.songNowPlay.setAttribute("aria-label", "Play");
       elements.playButton.setAttribute("aria-label", "Play");
       elements.playButton.title = "Play";
       updateScreenWakeLock().catch((error) => showToast(error instanceof Error ? error.message : "Could not release the screen lock."));
@@ -4045,6 +4099,9 @@
     player.addEventListener("timeupdate", () => {
       if (player !== audio) return;
       elements.currentTime.textContent = formatTime(player.currentTime);
+      elements.songNowCurrent.textContent = formatTime(player.currentTime);
+      elements.songNowDuration.textContent = formatTime(player.duration);
+      elements.songNowSeek.value = Number.isFinite(player.duration) && player.duration > 0 ? String(Math.round((player.currentTime / player.duration) * 1000)) : "0";
       if (Number.isFinite(player.duration) && player.duration > 0) {
         progress.value = Math.round((player.currentTime / player.duration) * 1000);
         const remaining = player.duration - player.currentTime;

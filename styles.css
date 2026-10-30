@@ -6416,3 +6416,36 @@ body.reduce-motion *::after {
     border-radius: 14px 14px 0 0;
   }
 }
+
+/* Mobile full-screen song player inspired by the supplied reference */
+.song-now-playing{display:none}
+@media(max-width:760px){
+ .song-now-playing{position:fixed;z-index:80;inset:0;overflow-y:auto;padding:calc(14px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#164e5d 0%,#123d49 52%,#101c20 100%);color:#fff}
+ .song-now-playing.is-open{display:block}
+ .song-now-header{display:flex;align-items:center;justify-content:space-between;height:38px;margin-bottom:18px}
+ .song-now-header button,.song-now-heading button,.song-now-controls button{border:0;background:transparent;color:inherit;cursor:pointer}
+ .song-now-header button{font-size:27px}
+ .song-now-header span{font-size:10px;font-weight:800;letter-spacing:.18em;opacity:.75}
+ .song-now-art-wrap{width:min(100%,min(78vw,390px));aspect-ratio:1;margin:0 auto 16px}
+ .song-now-art-wrap .mini-art{width:100%;height:100%;border-radius:8px;overflow:hidden}
+ .song-now-art-wrap .mini-art img{width:100%;height:100%;object-fit:cover}
+ .song-now-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 14px}
+ .song-now-heading h1{margin:0;font-size:22px;letter-spacing:-.03em}
+ .song-now-heading p{margin:5px 0 0;color:#b5c9ce;font-size:14px}
+ .song-now-heading button{font-size:28px}
+ .song-now-lyrics{display:flex;align-items:center;gap:8px;min-height:32px;margin:10px 0 24px;color:#c1d5d9;font-size:12px}
+ .song-now-lyrics span{padding:3px 5px;border-radius:3px;background:#d6e5e7;color:#23434b;font-size:10px;font-weight:800}
+ .song-now-progress{margin-top:10px}
+ .song-now-times{display:flex;justify-content:space-between;color:#b3c8cc;font-size:11px;font-variant-numeric:tabular-nums}
+ .song-now-progress input{width:100%;accent-color:#fff}
+ .song-now-controls{display:flex;align-items:center;justify-content:space-between;margin:17px 0 26px}
+ .song-now-controls button{font-size:24px;min-width:34px}
+ #song-now-play{width:62px;height:62px;border-radius:50%;background:#fff;color:#164653;font-size:25px}
+ .song-now-info{padding:18px;border-radius:17px;background:rgba(48,61,59,.94);box-shadow:0 8px 24px #0003}
+ .song-now-info h2{margin:0 0 18px;font-size:15px}
+ .song-now-info dl{display:grid;gap:6px;margin:0}
+ .song-now-info dt{margin-top:8px;color:#b3c0bf;font-size:12px}
+ .song-now-info dd{margin:0;font-size:14px;font-weight:700;overflow-wrap:anywhere}
+ body:has(.song-now-playing.is-open){overflow:hidden}
+ body:has(.song-now-playing.is-open) .player-bar,body:has(.song-now-playing.is-open) .mobile-nav{visibility:hidden}
+}

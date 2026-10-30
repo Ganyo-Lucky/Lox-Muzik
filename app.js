@@ -1580,6 +1580,8 @@
     document.body.classList.remove("has-player");
     radioAudio.pause();
     currentRadioStation = station;
+    radioMiniPlayerDismissed = false;
+    updateRadioMiniPlayer();
     radioNowPlaying.hidden = false;
     radioNowTitle.textContent = station.name;
     radioNowDetails.textContent = `${station.location} · ${station.format}`;
@@ -1593,6 +1595,8 @@
   };
   const stopRadioStation = () => {
     currentRadioStation = null;
+    radioMiniPlayerDismissed = false;
+    updateRadioMiniPlayer();
     radioAudio.pause();
     radioAudio.removeAttribute("src");
     radioAudio.load();

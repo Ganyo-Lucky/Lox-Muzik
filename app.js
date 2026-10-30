@@ -57,6 +57,11 @@
   const radioToggleButton = document.querySelector("#radio-toggle-button");
   const radioStopButton = document.querySelector("#radio-stop-button");
   const radioVolume = document.querySelector("#radio-volume");
+  const radioMiniPlayer = document.querySelector("#radio-mini-player");
+  const radioMiniTitle = document.querySelector("#radio-mini-title");
+  const radioMiniStatus = document.querySelector("#radio-mini-status");
+  const radioMiniToggle = document.querySelector("#radio-mini-toggle");
+  const radioMiniClose = document.querySelector("#radio-mini-close");
   const settingsButton = document.querySelector("#settings-button");
   const settingsView = document.querySelector("#settings-view");
   const settingsBackButton = document.querySelector("#settings-back");
@@ -1587,6 +1592,13 @@
     renderRadioStationCards(popularRadioGrid, radioStations.slice(0, 6), true);
     renderRadioStationCards(radioStationsGrid, getVisibleRadioStations());
   };
+  radioAudio.addEventListener("play", updateRadioMiniPlayer);
+  radioAudio.addEventListener("pause", updateRadioMiniPlayer);
+  radioMiniToggle.addEventListener("click", toggleRadioPlayback);
+  radioMiniClose.addEventListener("click", () => {
+    radioMiniPlayerDismissed = true;
+    updateRadioMiniPlayer();
+  });
   const toggleRadioPlayback = () => {
     if (!currentRadioStation) return;
     if (radioAudio.paused) {

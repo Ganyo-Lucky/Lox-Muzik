@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=mobile-search-overlay" />
+  <link rel="stylesheet" href="styles.css?v=lox-purple-player" />
 </head>
 
 <body>
@@ -932,135 +932,20 @@
 
   <section id="song-now-playing" class="song-now-playing" aria-label="Now playing" aria-hidden="true">
     <header class="song-now-header">
-      <button id="song-player-close" type="button" aria-label="Minimize player">⌄</button>
+      <button id="song-player-close" type="button" aria-label="Minimize player" title="Minimize player"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <span>NOW PLAYING</span>
-      <button id="song-player-queue" type="button" aria-label="Your music">♫</button>
+      <button id="song-player-queue" type="button" aria-label="Your music" title="Your music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h11M4 18h7"/><path d="M18 15v6m-3-3h6"/></svg></button>
     </header>
     <div class="song-now-art-wrap"><div id="song-now-art" class="mini-art art-0"><span>♫</span></div></div>
-    <div class="song-now-heading"><div><h1 id="song-now-title">Song title</h1><p id="song-now-artist">Artist</p></div><button id="song-now-like" type="button" aria-label="Like song">♡</button></div>
+    <div class="song-now-heading"><div><h1 id="song-now-title">Song title</h1><p id="song-now-artist">Artist</p></div><button id="song-now-like" type="button" aria-label="Like song" title="Like song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11a4.8 4.8 0 0 1 8.8-2.5 4.8 4.8 0 0 1 8.8 2.5Z"/></svg></button></div>
     <div class="song-now-lyrics"><span>LYRICS</span><p id="song-now-lyrics-copy">Lyrics are not available for this song yet.</p></div>
     <div class="song-now-progress"><div class="song-now-times"><span id="song-now-current">0:00</span><span id="song-now-duration">0:00</span></div><input id="song-now-seek" type="range" min="0" max="1000" value="0" aria-label="Seek song"></div>
     <div class="song-now-controls">
-      <button id="song-now-shuffle" type="button" aria-label="Shuffle">⤨</button>
-      <button id="song-now-previous" type="button" aria-label="Previous song">|◀</button>
-      <button id="song-now-play" type="button" aria-label="Pause">Ⅱ</button>
-      <button id="song-now-next" type="button" aria-label="Next song">▶|</button>
-      <button id="song-now-repeat" type="button" aria-label="Repeat">↻</button>
+      <button id="song-now-shuffle" type="button" aria-label="Shuffle" title="Shuffle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 4 4-4 4M4 17l4-4 4-6 4-4M4 7h4l2 2m4 6 2 2h4l-4 4"/></svg></button>
+      <button id="song-now-previous" type="button" aria-label="Previous song" title="Previous song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 6 8 12l11 6z"/></svg></button>
+      <button id="song-now-play" type="button" aria-label="Pause" title="Pause"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+      <button id="song-now-next" type="button" aria-label="Next song" title="Next song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M5 6l11 6-11 6z"/></svg></button>
+      <button id="song-now-repeat" type="button" aria-label="Repeat" title="Repeat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3"/></svg></button>
     </div>
     <section class="song-now-info"><h2>Song info</h2><dl><dt>Album</dt><dd id="song-now-album">Single</dd><dt>Artist</dt><dd id="song-now-artist-info">Artist</dd><dt>Genre</dt><dd id="song-now-genre">Not specified</dd><dt>Release</dt><dd id="song-now-release">Not specified</dd></dl></section>
-  </section>
-\n  <section id="radio-mini-player" class="radio-mini-player" aria-label="Radio player" hidden>
-    <div class="radio-mini-live" aria-hidden="true"><span></span></div>
-    <div class="radio-mini-copy">
-      <small id="radio-mini-status">LIVE · PLAYING</small>
-      <strong id="radio-mini-title">Radio station</strong>
-    </div>
-    <button id="radio-mini-toggle" class="radio-mini-control" type="button" aria-label="Pause radio">Ⅱ</button>
-    <button id="radio-mini-close" class="radio-mini-close" type="button" aria-label="Close radio player" title="Close player">×</button>
-  </section>
-
-  <section class="player-bar" aria-label="Music player" hidden>
-    <div class="now-playing">
-      <div class="mini-art art-0" id="player-art" aria-hidden="true"><span>♫</span></div>
-      <div class="now-playing-copy">
-        <strong id="player-title">Nothing playing yet</strong>
-        <span id="player-artist">Add a track to get started</span>
-      </div>
-      <button id="like-button" class="player-like" type="button" aria-label="Like this song" title="Like this song"
-        disabled>♡</button>
-    </div>
-    <div class="player-controls">
-      <div class="control-buttons">
-        <button id="previous-button" class="control-button secondary-control" type="button" aria-label="Previous track"
-          title="Previous track">|◀</button>
-        <button id="play-button" class="play-button" type="button" aria-label="Play" title="Play" disabled>▶</button>
-        <button id="next-button" class="control-button secondary-control" type="button" aria-label="Next track"
-          title="Next track">▶|</button>
-        <button id="download-button" class="control-button download-control" type="button"
-          aria-label="Download current track" title="Download current track" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-            stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3v11m0 0 4-4m-4 4-4-4" />
-            <path d="M5 16v4h14v-4" />
-          </svg>
-        </button>
-      </div>
-      <div class="progress-row">
-        <span id="current-time">0:00</span>
-        <input id="progress" type="range" min="0" max="1000" value="0" aria-label="Track progress" />
-        <span id="duration">0:00</span>
-      </div>
-    </div>
-    <div class="volume-control">
-      <span aria-hidden="true">◖</span>
-      <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" />
-      <span aria-hidden="true">◗</span>
-    </div>
-  </section>
-
-  <nav class="mobile-nav" aria-label="Mobile navigation">
-    <button class="mobile-nav-link is-active" data-view="browse" type="button"><span aria-hidden="true"><svg
-          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-          stroke-linejoin="round">
-          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
-        </svg></span>Home</button>
-    <button class="mobile-nav-link" data-view="radio" type="button"><span aria-hidden="true"><svg viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="18" r="1.5" />
-          <path
-            d="M12 16V4M8.5 7.5a5 5 0 0 0 0 7M15.5 7.5a5 5 0 0 1 0 7M5.5 4.5a9 9 0 0 0 0 13M18.5 4.5a9 9 0 0 1 0 13M9 21h6" />
-        </svg></span>Radio</button>
-    <button class="mobile-nav-link" data-focus-search type="button" aria-controls="search-container"
-      aria-expanded="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="10.8" cy="10.8" r="6.8" />
-          <path d="m16 16 5 5" />
-        </svg></span>Search</button>
-    <button class="mobile-nav-link" data-view="downloads" type="button"><span aria-hidden="true"><svg
-          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-          stroke-linejoin="round">
-          <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
-          <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
-        </svg></span>Downloads</button>
-    <button id="mobile-creator-nav" class="mobile-nav-link" data-view="creator" type="button" hidden><span
-        aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8z" />
-        </svg></span>Studio</button>
-    <button id="mobile-profile-nav" class="mobile-nav-link" data-view="profile" type="button" hidden><span
-        aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="3.2" />
-          <path d="M5 20a7 7 0 0 1 14 0" />
-        </svg></span>Profile</button>
-  </nav>
-
-  <audio id="audio-player" preload="metadata"></audio>
-  <audio id="crossfade-audio" preload="auto"></audio>
-  <audio id="radio-audio" preload="none"></audio>
-  <dialog id="download-destination-dialog" class="download-destination-dialog"
-    aria-labelledby="download-destination-title">
-    <div class="download-destination-content">
-      <p class="eyebrow section-eyebrow">SAVE YOUR MUSIC</p>
-      <h2 id="download-destination-title">Where should we save this song?</h2>
-      <p id="download-destination-track" class="download-destination-track"></p>
-      <button id="download-to-device" class="download-destination-option" type="button">
-        <span class="download-destination-icon" aria-hidden="true">↓</span>
-        <span><strong>Save to device</strong><small>Download a copy to your device. Your browser chooses where it is
-            saved.</small></span>
-      </button>
-      <button id="download-to-library" class="download-destination-option" type="button">
-        <span class="download-destination-icon" aria-hidden="true">♫</span>
-        <span><strong>Save to Offline Downloads</strong><small>Keep it in Lox-Muzik so you can play it here, even
-            offline.</small></span>
-      </button>
-      <button id="cancel-download-destination" class="download-destination-cancel" type="button">Cancel</button>
-    </div>
-  </dialog>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
-  <script src="songs/catalog.js"></script>
-  <script src="app.js?v=mobile-search-overlay"></script>
-</body>
-
-</html>
+  </section>>

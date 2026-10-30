@@ -1594,7 +1594,7 @@
   };
   radioAudio.addEventListener("play", updateRadioMiniPlayer);
   radioAudio.addEventListener("pause", updateRadioMiniPlayer);
-  radioMiniToggle.addEventListener("click", toggleRadioPlayback);
+  radioMiniToggle.addEventListener("click", () => toggleRadioPlayback());
   radioMiniClose.addEventListener("click", () => {
     radioMiniPlayerDismissed = true;
     updateRadioMiniPlayer();

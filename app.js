@@ -1534,8 +1534,20 @@
       container.append(card);
     });
   };
+  const updateRadioMiniPlayer = () => {
+    const shouldShow = Boolean(currentRadioStation && !radioAudio.paused && !radioMiniPlayerDismissed);
+    radioMiniPlayer.hidden = !shouldShow;
+    document.body.classList.toggle("has-radio-player", shouldShow);
+    if (currentRadioStation) {
+      radioMiniTitle.textContent = currentRadioStation.name;
+      radioMiniStatus.textContent = radioAudio.paused ? radioStatus : "LIVE · PLAYING";
+      radioMiniToggle.textContent = radioAudio.paused ? "▶" : "Ⅱ";
+      radioMiniToggle.setAttribute("aria-label", radioAudio.paused ? "Resume radio" : "Pause radio");
+    }
+  };
   const setRadioStatus = (status) => {
     radioStatus = status;
+    updateRadioMiniPlayer();
     radioLiveStatus.textContent = status;
     if (currentRadioStation) {
       radioNowPlaying.hidden = false;

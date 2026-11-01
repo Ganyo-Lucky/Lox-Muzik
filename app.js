@@ -20,6 +20,12 @@
   const trendsNavLink = document.querySelector("#trends-nav-link");
   const discoverNavLabel = document.querySelector("#discover-nav-label");
   const mobileCreatorNav = document.querySelector("#mobile-creator-nav");
+  const mobileProfileNav = document.querySelector("#mobile-profile-nav");
+  const mobileHomeNav = document.querySelector("#mobile-home-nav");
+  const mobileLibraryNav = document.querySelector("#mobile-library-nav");
+  const mobileSavedNav = document.querySelector("#mobile-saved-nav");
+  const mobileTrendsNav = document.querySelector("#mobile-trends-nav");
+  const discoverBrowseNavLink = document.querySelector(".discover-group [data-view='browse']");
   const creatorSongForm = document.querySelector("#creator-song-form");
   const creatorAudioFile = document.querySelector("#creator-audio-file");
   const creatorSongTitle = document.querySelector("#creator-song-title");
@@ -40,6 +46,7 @@
   const screenLockToggle = document.querySelector("#screen-lock-toggle");
   let isLoggedIn = false;
   let currentRole = null;
+  let isArtistProfileEditing = false;
   let accountEmail = "";
   let creatorName = "";
   let selectedAccountType = "listener";
@@ -49,6 +56,8 @@
   const radioAudio = document.querySelector("#radio-audio");
   const radioView = document.querySelector("#radio-view");
   const radioStationsGrid = document.querySelector("#radio-stations-grid");
+  const radioAddStation = document.querySelector(".radio-add-station");
+  const radioSourceNote = document.querySelector(".radio-source-note");
   const radioSearchEmpty = document.querySelector("#radio-search-empty");
   const radioNowPlaying = document.querySelector("#radio-now-playing");
   const radioLiveStatus = document.querySelector("#radio-live-status");
@@ -289,6 +298,38 @@
       streamUrl: "https://citi973fm.radioca.st/index.html:80/;stream.mp3",
     },
     {
+      id: "joy-fm",
+      name: "Joy FM",
+      badge: "99.7",
+      location: "Accra, Ghana",
+      format: "News · Music · Talk",
+      streamUrl: "https://mmg.streamguys1.com/JoyFM-mp3",
+    },
+    {
+      id: "peace-fm",
+      name: "Peace FM",
+      badge: "104.3",
+      location: "Accra, Ghana",
+      format: "News · Music · Talk",
+      streamUrl: "https://peacefm-atunwadigital.streamguys1.com/peacefm",
+    },
+    {
+      id: "adom-fm",
+      name: "Adom FM",
+      badge: "106.3",
+      location: "Accra, Ghana",
+      format: "News · Music · Talk",
+      streamUrl: "https://mmg.streamguys1.com/AdomFM-mp3",
+    },
+    {
+      id: "asempa-fm",
+      name: "Asempa FM",
+      badge: "94.7",
+      location: "Accra, Ghana",
+      format: "News · Music · Talk",
+      streamUrl: "https://mmg.streamguys1.com/AsempaFM-mp3",
+    },
+    {
       id: "ghana-music-radio",
       name: "Ghana Music Radio",
       badge: "GMR",
@@ -319,6 +360,14 @@
       location: "Kumasi, Ghana",
       format: "Music · News",
       streamUrl: "https://atunwadigital.streamguys1.com/hellofm",
+    },
+    {
+      id: "hitz-fm",
+      name: "Hitz FM",
+      badge: "103.9",
+      location: "Accra, Ghana",
+      format: "Music · Entertainment",
+      streamUrl: "https://mmg.streamguys1.com/HitzFM-mp3",
     },
     {
       id: "gbc-uniiq",
@@ -487,9 +536,31 @@
     songNowRelease: document.querySelector("#song-now-release"),
     songNowLike: document.querySelector("#song-now-like"),
     songNowPlay: document.querySelector("#song-now-play"),
+    songNowShuffle: document.querySelector("#song-now-shuffle"),
+    songNowPrevious: document.querySelector("#song-now-previous"),
+    songNowNext: document.querySelector("#song-now-next"),
+    songNowRepeat: document.querySelector("#song-now-repeat"),
     songNowCurrent: document.querySelector("#song-now-current"),
     songNowDuration: document.querySelector("#song-now-duration"),
     songNowSeek: document.querySelector("#song-now-seek"),
+  };
+  const setPlayerBarVisibility = (isVisible) => {
+    elements.playerBar.hidden = !isVisible;
+    elements.playerBar.setAttribute("aria-hidden", String(!isVisible));
+  };
+  const openSongNowPlaying = () => {
+    if (!currentTrack()) return;
+    elements.songNowPlaying.classList.add("is-open");
+    elements.songNowPlaying.setAttribute("aria-hidden", "false");
+  };
+  const updateSongNowRepeatControl = () => {
+    const mode = repeatModeSelect.value;
+    const label = mode === "one" ? "Repeat one song" : mode === "all" ? "Repeat all songs" : "Repeat off";
+    elements.songNowRepeat.classList.toggle("is-active", mode !== "off");
+    elements.songNowRepeat.dataset.repeatMode = mode;
+    elements.songNowRepeat.setAttribute("aria-label", label);
+    elements.songNowRepeat.setAttribute("aria-pressed", String(mode !== "off"));
+    elements.songNowRepeat.title = label;
   };
   const savedPlaybackVolume = Number(readStoredValue("loxMuzikPlaybackVolume", 0.8));
   const initialPlaybackVolume = Number.isFinite(savedPlaybackVolume)
@@ -513,6 +584,7 @@
   autoplayNextToggle.checked = autoplayNext.enabled;
   const storedRepeatMode = readStoredValue("loxMuzikRepeatMode", "off");
   repeatModeSelect.value = ["off", "all", "one"].includes(storedRepeatMode) ? storedRepeatMode : "off";
+  updateSongNowRepeatControl();
   const crossfadeEnabled = { value: readStoredValue("loxMuzikCrossfade", false) === true };
   crossfadeToggle.checked = crossfadeEnabled.value;
   const savedCrossfadeDuration = Number(readStoredValue("loxMuzikCrossfadeDuration", 5));
@@ -554,12 +626,16 @@
     return `${minutes}:${remainder}`;
   };
 
-  const showToast = (message) => {
+  const showToast = (message, position = "bottom") => {
     elements.toast.textContent = message;
+    elements.toast.classList.toggle("is-top", position === "top");
     elements.toast.classList.add("is-visible");
     window.clearTimeout(toastTimeout);
     toastTimeout = window.setTimeout(() => elements.toast.classList.remove("is-visible"), 2800);
   };
+  const audioPlaybackErrorMessage = () => window.location.protocol === "file:"
+    ? "Open Lox-Muzik with F5 in VS Code so your browser can load the songs."
+    : "This audio file could not be played in your browser.";
 
   const setWelcomeSlide = (index) => {
     welcomeSlideIndex = (index + welcomeSlides.length) % welcomeSlides.length;
@@ -1008,7 +1084,7 @@
     searchResultsPanel.hidden = true;
     searchInput.setAttribute("aria-expanded", "false");
     document.body.classList.remove("mobile-search-open");
-    mobileSearchButton.setAttribute("aria-expanded", "false");
+    if (mobileSearchButton) mobileSearchButton.setAttribute("aria-expanded", "false");
   };
   const searchMatches = (value, query) => String(value || "").toLocaleLowerCase().includes(query);
   const getVisibleRadioStations = () => {
@@ -1589,7 +1665,7 @@
     }
 
     audio.pause();
-    elements.playerBar.hidden = true;
+    setPlayerBarVisibility(false);
     document.body.classList.remove("has-player");
     radioAudio.pause();
     currentRadioStation = station;
@@ -1794,7 +1870,19 @@
     });
 
     document.querySelector("#artist-profile-preview-title").textContent = creatorName || "Your artist name";
-    const profilePhotoUrl = profilePhotoPreviewUrl || creatorProfile.photoUrl;
+    const profilePhotoUrl = profilePhotoChanged ? profilePhotoPreviewUrl : creatorProfile.photoUrl;
+    const editorPhotoUrl = profilePhotoChanged ? profilePhotoPreviewUrl : creatorProfile.photoUrl;
+    const coverPhoto = document.querySelector("#artist-profile-cover-photo");
+    coverPhoto.hidden = !profilePhotoUrl;
+    if (profilePhotoUrl) coverPhoto.src = profilePhotoUrl;
+    else coverPhoto.removeAttribute("src");
+    const editorPhotoPreview = document.querySelector("#creator-profile-photo-preview");
+    const photoPicker = document.querySelector(".profile-photo-picker");
+    photoPicker.classList.toggle("has-photo", Boolean(editorPhotoUrl));
+    document.querySelector("#creator-profile-photo-picker-hint").textContent = editorPhotoUrl ? "Tap to change photo" : "Choose a photo";
+    editorPhotoPreview.hidden = !editorPhotoUrl;
+    if (editorPhotoUrl) editorPhotoPreview.src = editorPhotoUrl;
+    else editorPhotoPreview.removeAttribute("src");
     const profileInitial = Array.from(creatorName.trim())[0] || "♫";
     const profilePhoto = document.querySelector("#artist-profile-avatar-photo");
     profilePhoto.hidden = !profilePhotoUrl;
@@ -1928,7 +2016,7 @@
       audio.load();
       currentTrackId = null;
       activeQueue = null;
-      elements.playerBar.hidden = true;
+      setPlayerBarVisibility(false);
       document.body.classList.remove("has-player");
     }
     URL.revokeObjectURL(track.url);
@@ -2020,6 +2108,8 @@
     settingsButton.setAttribute("aria-expanded", String(isSettingsView));
     creatorView.hidden = !isCreatorView;
     document.querySelector("#artist-profile-view").hidden = !isArtistProfileView;
+    document.querySelector(".artist-profile-preview").hidden = isArtistProfileEditing;
+    document.querySelector(".artist-profile-editor").hidden = !isArtistProfileEditing;
     browseView.hidden = !isBrowseView;
     likesView.hidden = activeView !== "likes";
     artistsDirectory.hidden = isArtistDetail;
@@ -2029,10 +2119,18 @@
     creatorNavGroup.hidden = !isCreatorAccount;
     libraryNavGroup.hidden = isCreatorAccount;
     sidebarBottom.hidden = isCreatorAccount;
-    trendsNavLink.hidden = isCreatorAccount;
+    trendsNavLink.hidden = false;
+    discoverBrowseNavLink.hidden = false;
+    discoverNavLabel.textContent = "Discover";
+    radioAddStation.hidden = !isCreatorAccount;
+    if (isCreatorAccount) radioView.insertBefore(radioAddStation, radioStationsGrid);
+    else radioSourceNote.after(radioAddStation);
     mobileCreatorNav.hidden = !isCreatorAccount;
-    document.querySelector("#mobile-profile-nav").hidden = !isCreatorAccount;
-    discoverNavLabel.textContent = isCreatorAccount ? "Explore" : "Discover";
+    mobileProfileNav.hidden = !isCreatorAccount;
+    mobileHomeNav.hidden = false;
+    mobileLibraryNav.hidden = isCreatorAccount;
+    mobileSavedNav.hidden = isCreatorAccount;
+    mobileTrendsNav.hidden = false;
     document.querySelectorAll("[data-scroll-song-form]").forEach((button) => {
       button.hidden = !(isLoggedIn && currentRole === "creator");
     });
@@ -2760,6 +2858,12 @@
     elements.playButton.disabled = !track;
     elements.likeButton.disabled = !track;
     elements.downloadButton.disabled = !track;
+    elements.songNowLike.disabled = !track;
+    elements.songNowPlay.disabled = !track;
+    elements.songNowShuffle.disabled = !track;
+    elements.songNowPrevious.disabled = !track;
+    elements.songNowNext.disabled = !track;
+    elements.songNowSeek.disabled = !track;
     if (!track) return;
     elements.downloadButton.title = track.isJamendo && !track.downloadAllowed
       ? "Open the track source for its license and download options"
@@ -2776,9 +2880,12 @@
     elements.songNowAlbum.textContent = track.album || (track.releaseType === "album" ? "Album" : "Single");
     elements.songNowGenre.textContent = track.genre || track.genres?.join(", ") || "Not specified";
     elements.songNowRelease.textContent = track.releaseYear || track.year || "Not specified";
-    elements.songNowLike.textContent = isTrackLiked(track) ? "♥" : "♡";
     elements.songNowDuration.textContent = formatTime(track.duration || audio.duration);
     const trackIsLiked = isTrackLiked(track);
+    elements.songNowLike.textContent = trackIsLiked ? "♥" : "♡";
+    elements.songNowLike.setAttribute("aria-label", trackIsLiked ? "Unlike song" : "Like song");
+    elements.songNowLike.setAttribute("aria-pressed", String(trackIsLiked));
+    elements.songNowLike.title = trackIsLiked ? "Unlike song" : "Like song";
     elements.likeButton.textContent = trackIsLiked ? "♥" : "♡";
     elements.likeButton.classList.toggle("is-liked", trackIsLiked);
     elements.likeButton.setAttribute("aria-label", trackIsLiked ? "Unlike this song" : "Like this song");
@@ -2836,7 +2943,7 @@
       currentTrackId = track.id;
       selectedReleaseTrackId = track.id;
       activeQueue = queue ? queue.slice() : null;
-      elements.playerBar.hidden = false;
+      setPlayerBarVisibility(true);
       document.body.classList.add("has-player");
       crossfadeInProgress = true;
       crossfadeProgress = 0;
@@ -2966,12 +3073,9 @@
     currentTrackId = id;
     selectedReleaseTrackId = id;
     if (shouldPlay) {
-      elements.playerBar.hidden = false;
+      setPlayerBarVisibility(true);
       document.body.classList.add("has-player");
-      if (window.matchMedia("(max-width: 760px)").matches) {
-        elements.songNowPlaying.classList.add("is-open");
-        elements.songNowPlaying.setAttribute("aria-hidden", "false");
-      }
+      if (window.matchMedia("(max-width: 760px)").matches) openSongNowPlaying();
     }
     audio.src = track.url;
     audio.preload = getAudioPreload();
@@ -2986,7 +3090,7 @@
     updatePlayer();
     render();
     if (shouldPlay) {
-      audio.play().catch(() => showToast("This audio file could not be played in your browser."));
+      audio.play().catch(() => showToast(audioPlaybackErrorMessage()));
     }
   };
 
@@ -2995,7 +3099,7 @@
     if (!requireLogin("play music")) return;
     if (audio.paused) {
       if (currentRadioStation) stopRadioStation();
-      audio.play().catch(() => showToast("This audio file could not be played in your browser."));
+      audio.play().catch(() => showToast(audioPlaybackErrorMessage()));
     } else {
       audio.pause();
     }
@@ -3030,6 +3134,13 @@
     if (view === "creator" && !requireCreator("open Creator Studio")) return;
     if (view === "profile" && !requireCreator("open your artist profile")) return;
     if (view === "downloads" && !requireLogin("open your downloads")) return;
+    if (isLoggedIn && currentRole === "creator"
+      && (["playlists", "songs", "albums", "artists", "likes"].includes(view)
+        || view.startsWith("playlist:"))) {
+      showToast("That section is only available to listener accounts.");
+      return;
+    }
+    if (view === "profile" && activeView !== "profile") isArtistProfileEditing = false;
     closeTopbarPanels();
     if (view === "artists" && !artistName) searchInput.value = "";
     activeView = view;
@@ -3047,7 +3158,7 @@
     brandLink.addEventListener("click", (event) => {
       event.preventDefault();
       selectedMadeForYouArtist = null;
-      setView("browse");
+      setView(currentRole === "creator" ? "creator" : "browse");
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
@@ -3537,7 +3648,10 @@
     if (currentRole === "creator") setView("creator");
     else if (activeView === "creator" || activeView === "profile") setView("browse");
     else render();
-    showToast(currentRole === "creator" ? "Welcome to Creator Studio." : "Welcome to Lox-Muzik.");
+    showToast(
+      currentRole === "creator" ? "Welcome to Creator Studio." : "Welcome to Lox-Muzik.",
+      currentRole === "creator" ? "top" : "bottom",
+    );
   };
 
   const logOut = () => {
@@ -3568,7 +3682,7 @@
       audio.load();
       currentTrackId = null;
       activeQueue = null;
-      elements.playerBar.hidden = true;
+      setPlayerBarVisibility(false);
       document.body.classList.remove("has-player");
     }
     if (currentRadioStation?.ownerEmail === email) stopRadioStation();
@@ -3697,6 +3811,17 @@
     }
   });
 
+  document.querySelector("#artist-profile-edit").addEventListener("click", () => {
+    isArtistProfileEditing = true;
+    render();
+    document.querySelector("#artist-profile-editor-title").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#creator-display-name").focus({ preventScroll: true });
+  });
+  document.querySelector("#artist-profile-cancel").addEventListener("click", () => {
+    isArtistProfileEditing = false;
+    clearProfilePhotoPreview();
+    render();
+  });
   creatorProfilePhotoInput.addEventListener("change", () => {
     const file = creatorProfilePhotoInput.files?.[0];
     if (!file) return;
@@ -3771,6 +3896,7 @@
     }
     creatorName = nextName;
     creatorProfile = nextProfile;
+    isArtistProfileEditing = false;
     clearProfilePhotoPreview();
     updateLoginButtons();
     tracks.forEach((track) => {
@@ -3918,13 +4044,24 @@
     });
   });
   elements.playButton.addEventListener("click", togglePlayback);
+  elements.playerBar.addEventListener("click", (event) => {
+    if (!window.matchMedia("(max-width: 760px)").matches) return;
+    if (event.target.closest("button, input, label, select, textarea, a")) return;
+    openSongNowPlaying();
+  });
   document.querySelector("#song-player-close").addEventListener("click", () => {
     elements.songNowPlaying.classList.remove("is-open");
     elements.songNowPlaying.setAttribute("aria-hidden", "true");
   });
+  document.querySelector("#song-player-queue").addEventListener("click", () => {
+    elements.songNowPlaying.classList.remove("is-open");
+    elements.songNowPlaying.setAttribute("aria-hidden", "true");
+    setView("songs");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
   document.querySelector("#song-now-play").addEventListener("click", togglePlayback);
-  document.querySelector("#song-now-previous").addEventListener("click", () => moveTrack(-1));
-  document.querySelector("#song-now-next").addEventListener("click", () => moveTrack(1));
+  elements.songNowPrevious.addEventListener("click", () => moveTrack(-1));
+  elements.songNowNext.addEventListener("click", () => moveTrack(1));
   elements.songNowLike.addEventListener("click", () => {
     const track = currentTrack();
     if (!track) return;
@@ -3935,12 +4072,12 @@
   elements.songNowSeek.addEventListener("input", () => {
     if (Number.isFinite(audio.duration) && audio.duration > 0) audio.currentTime = (Number(elements.songNowSeek.value) / 1000) * audio.duration;
   });
-  document.querySelector("#song-now-repeat").addEventListener("click", () => {
+  elements.songNowRepeat.addEventListener("click", () => {
     repeatModeSelect.value = repeatModeSelect.value === "off" ? "all" : repeatModeSelect.value === "all" ? "one" : "off";
-    writeStoredValue("loxMuzikRepeatMode", repeatModeSelect.value);
+    repeatModeSelect.dispatchEvent(new Event("change", { bubbles: true }));
     showToast(`Repeat: ${repeatModeSelect.value}`);
   });
-  document.querySelector("#song-now-shuffle").addEventListener("click", () => {
+  elements.songNowShuffle.addEventListener("click", () => {
     const ids = getReleaseTracks().map((track) => track.id);
     for (let i = ids.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
     if (ids.length) selectTrack(ids[0], true, ids);
@@ -4041,6 +4178,7 @@
   repeatModeSelect.addEventListener("change", () => {
     if (!["off", "all", "one"].includes(repeatModeSelect.value)) repeatModeSelect.value = "off";
     writeStoredValue("loxMuzikRepeatMode", repeatModeSelect.value);
+    updateSongNowRepeatControl();
   });
   reduceMotionToggle.addEventListener("change", () => {
     const reduceMotion = reduceMotionToggle.checked;
@@ -4125,13 +4263,13 @@
       if (player !== audio) return;
       if (repeatModeSelect.value === "one" && currentTrack()) {
         player.currentTime = 0;
-        player.play().catch(() => showToast("This audio file could not be played in your browser."));
+        player.play().catch(() => showToast(audioPlaybackErrorMessage()));
         return;
       }
       if (repeatModeSelect.value === "all" || autoplayNext.enabled) moveTrack(1);
     });
     player.addEventListener("error", () => {
-      if (player === audio && currentTrack()) showToast("There was a problem loading this audio file.");
+      if (player === audio && currentTrack()) showToast(audioPlaybackErrorMessage());
     });
   });
   progress.addEventListener("input", () => {
@@ -4171,11 +4309,168 @@
     render();
   }, 60_000);
 
+  function initializeCompactSelects() {
+    let openControl = null;
+
+    function closeOpenControl(restoreFocus = false) {
+      if (!openControl) return;
+      const control = openControl;
+      openControl = null;
+      control.menu.hidden = true;
+      control.menu.classList.remove("opens-upward");
+      control.trigger.setAttribute("aria-expanded", "false");
+      control.wrapper.classList.remove("is-open");
+      if (restoreFocus) control.trigger.focus();
+    }
+
+    Array.from(document.querySelectorAll("select")).forEach((select, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "compact-select";
+      select.parentNode.insertBefore(wrapper, select);
+      wrapper.append(select);
+
+      const label = Array.from(select.labels)
+        .map((fieldLabel) => fieldLabel.querySelector(".setting-select strong")
+          || fieldLabel.querySelector(":scope > span"))
+        .find(Boolean);
+      const labelText = label ? label.textContent.trim() : "";
+      const accessibleName = select.getAttribute("aria-label") || labelText || "Choose an option";
+      const trigger = document.createElement("button");
+      trigger.className = "compact-select-trigger";
+      trigger.type = "button";
+      trigger.setAttribute("aria-label", accessibleName);
+      trigger.setAttribute("aria-haspopup", "listbox");
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.setAttribute("aria-controls", `compact-select-list-${index}`);
+
+      const menu = document.createElement("div");
+      menu.className = "compact-select-menu";
+      menu.id = `compact-select-list-${index}`;
+      menu.setAttribute("role", "listbox");
+      menu.setAttribute("aria-label", accessibleName);
+      menu.hidden = true;
+      wrapper.append(trigger, menu);
+
+      select.hidden = true;
+      select.tabIndex = -1;
+      select.setAttribute("aria-hidden", "true");
+
+      const getOptions = () => Array.from(menu.querySelectorAll('[role="option"]:not(:disabled)'));
+      const updateSelection = () => {
+        const selectedOption = select.options[select.selectedIndex];
+        trigger.textContent = selectedOption ? selectedOption.label : "Choose an option";
+        Array.from(menu.querySelectorAll('[role="option"]')).forEach((option) => {
+          option.setAttribute("aria-selected", String(Number(option.dataset.optionIndex) === select.selectedIndex));
+        });
+      };
+      const renderOptions = () => {
+        menu.replaceChildren();
+        Array.from(select.options).forEach((option, optionIndex) => {
+          const item = document.createElement("button");
+          item.className = "compact-select-option";
+          item.type = "button";
+          item.setAttribute("role", "option");
+          item.setAttribute("aria-selected", String(optionIndex === select.selectedIndex));
+          item.dataset.optionIndex = String(optionIndex);
+          item.textContent = option.label;
+          item.disabled = option.disabled || Boolean(option.parentElement.disabled);
+          item.tabIndex = -1;
+          item.addEventListener("click", () => {
+            const changed = select.selectedIndex !== optionIndex;
+            select.selectedIndex = optionIndex;
+            updateSelection();
+            closeOpenControl(true);
+            if (changed) {
+              select.dispatchEvent(new Event("input", { bubbles: true }));
+              select.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          });
+          menu.append(item);
+        });
+        updateSelection();
+      };
+      const control = {
+        wrapper,
+        trigger,
+        menu,
+      };
+      const open = () => {
+        if (openControl === control) return;
+        closeOpenControl();
+        renderOptions();
+        menu.hidden = false;
+        trigger.setAttribute("aria-expanded", "true");
+        wrapper.classList.add("is-open");
+        const bounds = trigger.getBoundingClientRect();
+        const menuHeight = Math.min(menu.scrollHeight, 220);
+        menu.classList.toggle(
+          "opens-upward",
+          window.innerHeight - bounds.bottom < menuHeight + 8 && bounds.top > menuHeight + 8,
+        );
+        openControl = control;
+      };
+      const focusOption = (index) => {
+        const options = getOptions();
+        if (options.length) options[Math.max(0, Math.min(index, options.length - 1))].focus();
+      };
+
+      trigger.addEventListener("click", () => {
+        if (openControl === control) closeOpenControl();
+        else open();
+      });
+      trigger.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && openControl === control) {
+          event.preventDefault();
+          closeOpenControl(true);
+          return;
+        }
+        if (event.key === "Tab" && openControl === control) {
+          closeOpenControl();
+          return;
+        }
+        if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+        event.preventDefault();
+        open();
+        const options = getOptions();
+        const selectedIndex = options.findIndex((option) => Number(option.dataset.optionIndex) === select.selectedIndex);
+        focusOption(selectedIndex >= 0 ? selectedIndex : 0);
+      });
+      menu.addEventListener("keydown", (event) => {
+        const options = getOptions();
+        const currentIndex = options.indexOf(document.activeElement);
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeOpenControl(true);
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          focusOption(currentIndex + (event.key === "ArrowDown" ? 1 : -1));
+        } else if (event.key === "Home" || event.key === "End") {
+          event.preventDefault();
+          focusOption(event.key === "Home" ? 0 : options.length - 1);
+        } else if (event.key === "Tab") {
+          closeOpenControl();
+        }
+      });
+      select.addEventListener("change", updateSelection);
+      new MutationObserver(renderOptions).observe(select, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      });
+      renderOptions();
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (openControl && !openControl.wrapper.contains(event.target)) closeOpenControl();
+    });
+  }
+
   setWelcomeSlide(welcomeSlideIndex);
   updateLoginButtons();
   if (authPage) authPage.classList.add("app-shell-hidden");
   if (appShell) appShell.classList.remove("app-shell-hidden");
   render();
+  initializeCompactSelects();
   if ("serviceWorker" in navigator && window.isSecureContext) {
     navigator.serviceWorker.register("./service-worker.js").catch((error) => {
       console.error("Could not prepare Lox-Muzik for offline use.", error);

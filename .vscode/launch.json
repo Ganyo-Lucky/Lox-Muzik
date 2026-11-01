@@ -7,8 +7,9 @@
         {
             "type": "editor-browser",
             "request": "launch",
-            "name": "Open index.html",
-            "url": "file:///c%3A/Users/BITCOIN-TAHUF/Desktop/Lox_muzik/index.html"
+            "name": "Open Lox-Muzik",
+            "url": "http://127.0.0.1:8765/index.html",
+            "preLaunchTask": "Serve Lox-Muzik"
         }
     ]
 }

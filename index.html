@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=lox-purple-player" />
+  <link rel="stylesheet" href="style.css?v=creator-welcome-toast-1" />
 </head>
 
 <body>
@@ -123,13 +123,6 @@
               <circle cx="12" cy="8" r="3.2" />
               <path d="M5 20a7 7 0 0 1 14 0" />
             </svg></span> Artist Profile
-        </button>
-        <button class="nav-link creator-nav-link" data-view="downloads" type="button">
-          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
-              <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
-            </svg></span> Downloads
         </button>
       </div>
 
@@ -523,25 +516,48 @@
         <p id="radio-search-empty" class="radio-search-empty" hidden>No radio stations match your search.</p>
         <p class="radio-source-note">Live streams come from their broadcasters and may vary by region or availability.
         </p>
-        <section class="creator-panel radio-add-station" aria-labelledby="radio-add-station-title">
+        <section class="creator-panel radio-add-station" aria-labelledby="radio-add-station-title" hidden>
           <div class="creator-panel-heading">
             <div>
               <p class="eyebrow">BROADCAST</p>
               <h2 id="radio-add-station-title">Add your radio station</h2>
             </div>
           </div>
-          <p class="creator-note">Share your station with listeners. Adding a station requires a Creator account and a
-            direct public audio stream URL.</p>
+          <p class="creator-note">Add the station details listeners need to recognize it, then provide its public live
+            audio stream. Use a direct stream URL, not a station website or embedded player.</p>
           <form id="creator-radio-form" class="creator-radio-form">
-            <label class="field"><span>Station name</span><input name="stationName" placeholder="My Radio"
-                maxlength="60" required /></label>
-            <label class="field"><span>Location</span><input name="stationLocation" placeholder="Accra, Ghana · Online"
-                maxlength="80" required /></label>
-            <label class="field"><span>Station format</span><input name="stationFormat"
-                placeholder="Music · Talk · News" maxlength="80" required /></label>
-            <label class="field creator-stream-field"><span>Live stream URL</span><input name="streamUrl" type="url"
-                placeholder="https://your-station.example/stream" required /></label>
-            <button class="artist-play-button" type="submit">＋ Add station</button>
+            <fieldset class="radio-form-section">
+              <legend>Station details</legend>
+              <label class="field">
+                <span>Station name</span>
+                <input name="stationName" placeholder="e.g. Accra City Radio" maxlength="60" autocomplete="organization"
+                  aria-describedby="radio-station-name-help" required />
+                <small id="radio-station-name-help">Use the name your listeners know.</small>
+              </label>
+              <label class="field">
+                <span>Location</span>
+                <input name="stationLocation" placeholder="e.g. Accra, Ghana or Online" maxlength="80"
+                  autocomplete="address-level2" aria-describedby="radio-station-location-help" required />
+                <small id="radio-station-location-help">Enter your city and country, or “Online”.</small>
+              </label>
+              <label class="field">
+                <span>Station format</span>
+                <input name="stationFormat" placeholder="e.g. Afrobeats · News · Talk" maxlength="80"
+                  aria-describedby="radio-station-format-help" required />
+                <small id="radio-station-format-help">List the music, language, or shows you broadcast.</small>
+              </label>
+            </fieldset>
+            <fieldset class="radio-form-section radio-stream-section">
+              <legend>Live stream</legend>
+              <label class="field">
+                <span>Direct audio stream URL</span>
+                <input name="streamUrl" type="url" inputmode="url" autocomplete="url" maxlength="2048"
+                  placeholder="https://example.com/live.mp3" aria-describedby="radio-stream-url-help" required />
+                <small id="radio-stream-url-help">Use a public HTTP or HTTPS audio stream link. Website pages, embed
+                  links, and streams that require sign-in won’t play.</small>
+              </label>
+            </fieldset>
+            <button class="artist-play-button radio-submit-button" type="submit">＋ Add station</button>
           </form>
         </section>
       </section>
@@ -658,18 +674,6 @@
           <button class="artist-action-button" data-view="profile" type="button">Edit artist profile</button>
         </section>
 
-        <section class="creator-panel" aria-labelledby="creator-radio-title">
-          <div class="creator-panel-heading">
-            <div>
-              <p class="eyebrow">BROADCAST</p>
-              <h2 id="creator-radio-title">Add your radio station</h2>
-            </div>
-          </div>
-          <p class="creator-note">Add a radio station from the Radio page. Your station will appear in the Radio
-            directory on this device.</p>
-          <button class="artist-action-button" data-view="radio" type="button">Go to Radio</button>
-        </section>
-
         <section class="creator-panel creator-trending-panel" aria-labelledby="creator-trending-title">
           <div class="creator-panel-heading">
             <div>
@@ -702,13 +706,14 @@
           <div>
             <p class="eyebrow section-eyebrow">ARTIST PROFILE</p>
             <h1 id="artist-profile-page-title">Artist profile</h1>
-            <p>Update your artist details and preview how your page will look to listeners.</p>
+            <p>Preview your artist page and update your details when you are ready.</p>
           </div>
           <span class="profile-visibility-badge"><span aria-hidden="true">●</span> Profile preview</span>
         </div>
         <div class="artist-profile-layout">
           <section class="artist-profile-preview creator-panel" aria-labelledby="artist-profile-preview-title">
             <div class="artist-profile-cover">
+              <img id="artist-profile-cover-photo" class="artist-profile-cover-photo" alt="" aria-hidden="true" hidden />
               <span class="artist-profile-avatar" aria-hidden="true">
                 <img id="artist-profile-avatar-photo" alt="" hidden />
                 <span id="artist-profile-avatar-initials">♫</span>
@@ -730,25 +735,38 @@
               <div><strong id="artist-profile-follower-count">0</strong><span>Followers</span></div>
             </div>
             <p class="artist-profile-preview-note">Profile preview for this browser.</p>
+            <div class="artist-profile-preview-actions">
+              <button id="artist-profile-edit" class="artist-play-button" type="button">Edit profile</button>
+            </div>
           </section>
-          <section class="creator-panel artist-profile-editor" aria-labelledby="artist-profile-editor-title">
+          <section class="creator-panel artist-profile-editor" aria-labelledby="artist-profile-editor-title" hidden>
             <div class="creator-panel-heading">
               <div>
                 <p class="eyebrow">PROFILE DETAILS</p>
                 <h2 id="artist-profile-editor-title">Edit your details</h2>
               </div>
+              <button id="artist-profile-cancel" class="artist-action-button" type="button">Cancel</button>
             </div>
             <form id="creator-profile-form" class="artist-profile-form">
               <label class="field"><span>Artist or creator name</span><input id="creator-display-name"
                   name="creatorName" maxlength="60" required /></label>
               <div class="profile-photo-field">
-                <label class="field" for="creator-profile-photo">
+                <div class="field">
                   <span>Profile photo</span>
-                  <input id="creator-profile-photo" name="profilePhoto" type="file"
-                    accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
-                    aria-describedby="creator-profile-photo-help" />
+                  <span class="profile-photo-control">
+                    <label class="profile-photo-picker" for="creator-profile-photo"
+                      aria-label="Choose or change profile photo">
+                      <input id="creator-profile-photo" name="profilePhoto" type="file"
+                        accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                        aria-describedby="creator-profile-photo-help" />
+                      <span class="profile-photo-placeholder" aria-hidden="true">+</span>
+                      <img id="creator-profile-photo-preview" class="profile-photo-preview" alt="Selected profile photo"
+                        hidden />
+                    </label>
+                    <span id="creator-profile-photo-picker-hint" class="profile-photo-picker-hint">Choose a photo</span>
+                  </span>
                   <small id="creator-profile-photo-help">Choose a JPG, PNG, or WebP image up to 8 MB.</small>
-                </label>
+                </div>
                 <button id="creator-profile-photo-remove" class="artist-action-button" type="button">Remove
                   photo</button>
               </div>
@@ -928,6 +946,45 @@
 
     </main>
 
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button id="mobile-home-nav" class="mobile-nav-link" data-view="browse" type="button" aria-label="Home">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg></span>
+        <small>Home</small>
+      </button>
+      <button id="mobile-library-nav" class="mobile-nav-link" data-view="songs" type="button" aria-label="Library">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M10 18V5l10-2v13" /><circle cx="7" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></svg></span>
+        <small>Library</small>
+      </button>
+      <button id="mobile-radio-nav" class="mobile-nav-link" data-view="radio" type="button" aria-label="Radio">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="18" r="1.5" /><path d="M12 16V4M8.5 7.5a5 5 0 0 0 0 7M15.5 7.5a5 5 0 0 1 0 7M5.5 4.5a9 9 0 0 0 0 13M18.5 4.5a9 9 0 0 1 0 13M9 21h6" /></svg></span>
+        <small>Radio</small>
+      </button>
+      <button id="mobile-trends-nav" class="mobile-nav-link" data-view="trends" type="button" aria-label="Trends">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5 9 12l3.5 3.5L20 7.5" /><path d="M14.5 7.5H20V13" /><path d="M3 20h18" /></svg></span>
+        <small>Trends</small>
+      </button>
+      <button id="mobile-saved-nav" class="mobile-nav-link" data-view="likes" type="button" aria-label="Saved music">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11a4.8 4.8 0 0 1 8.8-2.5 4.8 4.8 0 0 1 8.8 2.5Z" /></svg></span>
+        <small>Saved</small>
+      </button>
+      <button id="mobile-creator-nav" class="mobile-nav-link" data-view="creator" type="button" aria-label="Creator Studio"
+        hidden>
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8z" /><path d="m19 2 .8 2.2L22 5l-2.2.8L19 8l-.8-2.2L16 5l2.2-.8z" /></svg></span>
+        <small>Studio</small>
+      </button>
+      <button id="mobile-profile-nav" class="mobile-nav-link" data-view="profile" type="button" aria-label="Artist profile"
+        hidden>
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5 20a7 7 0 0 1 14 0" /></svg></span>
+        <small>Profile</small>
+      </button>
+    </nav>
   </div>
 
   <section id="song-now-playing" class="song-now-playing" aria-label="Now playing" aria-hidden="true">
@@ -956,9 +1013,30 @@
   <audio id="crossfade-audio" preload="metadata"></audio>
   <audio id="radio-audio" preload="none"></audio>
   <div class="player-bar" hidden aria-hidden="true">
-    <div class="now-playing"><div id="player-art" class="mini-art"></div><div><strong id="player-title"></strong><span id="player-artist"></span></div></div>
-    <div class="player-controls"><button id="previous-button" type="button" aria-label="Previous">|◀</button><button id="play-button" type="button" aria-label="Play">▶</button><button id="next-button" type="button" aria-label="Next">▶|</button><input id="progress" type="range" min="0" max="1000" value="0"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
-    <button id="like-button" type="button" aria-label="Like">♡</button><button id="download-button" type="button" aria-label="Download">↓</button><input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+    <div class="now-playing">
+      <div id="player-art" class="mini-art"></div>
+      <div class="now-playing-copy"><strong id="player-title"></strong><span id="player-artist"></span></div>
+    </div>
+    <div class="player-controls" aria-label="Playback controls">
+      <div class="player-transport">
+        <button id="previous-button" type="button" aria-label="Previous">|◀</button>
+        <button id="play-button" type="button" aria-label="Play">▶</button>
+        <button id="next-button" type="button" aria-label="Next">▶|</button>
+      </div>
+      <div class="player-progress">
+        <span id="current-time">0:00</span>
+        <input id="progress" type="range" min="0" max="1000" value="0" aria-label="Song progress">
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+    <div class="player-actions">
+      <button id="like-button" type="button" aria-label="Like">♡</button>
+      <button id="download-button" type="button" aria-label="Download">↓</button>
+      <label class="volume-control">
+        <span aria-hidden="true">♪</span>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+      </label>
+    </div>
   </div>
   <div id="radio-mini-player" class="radio-mini-player" hidden>
     <span class="radio-mini-live" aria-hidden="true"></span>
@@ -972,10 +1050,7 @@
     <button id="download-to-library" type="button">Save to library</button>
     <button id="cancel-download-destination" type="button">Cancel</button>
   </dialog>
-  <div id="toast" role="status" aria-live="polite"></div>
-  <nav id="mobile-creator-nav" hidden><button type="button" data-view="creator">Creator Studio</button></nav>
-  <nav id="mobile-profile-nav" hidden><button type="button" data-view="profile">Profile</button></nav>
-
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="songs/catalog.js"></script>
   <script src="app.js"></script>
 </body>

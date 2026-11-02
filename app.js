@@ -4217,6 +4217,9 @@
       elements.playButton.textContent = "Ⅱ";
       elements.playButton.setAttribute("aria-label", "Pause");
       elements.playButton.title = "Pause";
+      elements.songNowPlay.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>';
+      elements.songNowPlay.setAttribute("aria-label", "Pause");
+      elements.songNowPlay.title = "Pause";
       updateScreenWakeLock().catch((error) => showToast(error instanceof Error ? error.message : "Could not keep the screen awake."));
     });
     player.addEventListener("pause", () => {

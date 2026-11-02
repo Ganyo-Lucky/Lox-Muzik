@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=creator-welcome-toast-1" />
+  <link rel="stylesheet" href="style.css?v=supabase-social-auth-1" />
 </head>
 
 <body>
@@ -52,6 +52,13 @@
 
         <button class="primary-button auth-submit" type="submit">Continue as listener</button>
       </form>
+
+      <div class="social-auth-divider"><span>or continue with</span></div>
+      <div class="social-auth-buttons">
+        <button id="google-auth-button" class="social-auth-button" type="button"><span class="google-mark" aria-hidden="true">G</span> Continue with Google</button>
+        <button id="apple-auth-button" class="social-auth-button" type="button"><span class="apple-mark" aria-hidden="true">●</span> Continue with Apple</button>
+      </div>
+      <p id="social-auth-message" class="social-auth-message" role="status" aria-live="polite"></p>
 
       <p class="signup-text">
         <span id="signup-copy">New to Lox-Muzik?</span>
@@ -1056,5 +1063,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="songs/catalog.js"></script>
   <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>

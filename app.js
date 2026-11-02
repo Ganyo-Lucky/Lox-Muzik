@@ -4,6 +4,8 @@
   const menuLoginButton = document.querySelector("#menu-login-button");
   const topLoginButton = document.querySelector("#top-login-button");
   const loginForm = document.querySelector("#login-form");
+  const socialAuthMessage = document.querySelector("#social-auth-message");
+  const supabaseClient = window.supabase?.createClient("https://gxxgjkqmagkqqindihes.supabase.co", "sb_publishable_MQ_31skTckUXUuGzRsSSGg_wqxGpSwD");
   const accountTypeCards = Array.from(document.querySelectorAll("[data-account-type]"));
   const creatorView = document.querySelector("#creator-view");
   const browseView = document.querySelector("#browse-view");
@@ -3731,6 +3733,36 @@
       ? "Local profile details deleted and signed out."
       : "Signed out and removed this profile for this session, but some local data could not be saved.");
   });
+
+  const beginSocialAuth = async (provider) => {
+    if (!supabaseClient) {
+      if (socialAuthMessage) socialAuthMessage.textContent = "Sign-in service is unavailable. Please refresh and try again.";
+      return;
+    }
+    if (socialAuthMessage) socialAuthMessage.textContent = "Opening " + (provider === "google" ? "Google" : "Apple") + " sign-in…";
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: window.location.href }
+    });
+    if (error && socialAuthMessage) socialAuthMessage.textContent = error.message;
+  };
+
+  document.querySelector("#google-auth-button")?.addEventListener("click", () => beginSocialAuth("google"));
+  document.querySelector("#apple-auth-button")?.addEventListener("click", () => beginSocialAuth("apple"));
+
+  if (supabaseClient) {
+    supabaseClient.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        if (socialAuthMessage) socialAuthMessage.textContent = error.message;
+        return;
+      }
+      if (data.session?.user?.email && !isLoggedIn) completeLogin(data.session.user.email);
+    });
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user?.email && !isLoggedIn) completeLogin(session.user.email);
+      if (event === "SIGNED_OUT" && isLoggedIn) logOut();
+    });
+  }
 
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();

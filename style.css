@@ -7382,3 +7382,13 @@ body.creator-mode .search-container {
     max-height: min(200px, 35vh);
   }
 }
+
+/* Supabase social sign-in controls — matching Lox-Muzik's existing theme */
+.social-auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0 12px;color:var(--muted);font-size:12px}
+.social-auth-divider:before,.social-auth-divider:after{content:"";height:1px;flex:1;background:var(--line)}
+.social-auth-buttons{display:grid;grid-template-columns:1fr;gap:10px}
+.social-auth-button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-raised);color:var(--text);font:inherit;font-weight:700;cursor:pointer;transition:border-color .16s,background .16s}
+.social-auth-button:hover{border-color:var(--purple);background:rgba(203,82,238,.08)}
+.google-mark{font-size:19px;font-weight:800;color:#4285f4}
+.apple-mark{font-size:17px;color:var(--text)}
+.social-auth-message{min-height:16px;margin:8px 0 0;color:var(--muted);font-size:12px;text-align:center}

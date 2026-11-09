@@ -5,7 +5,17 @@
   const topProfileButton = document.querySelector("#top-profile-button");
   const loginForm = document.querySelector("#login-form");
   const socialAuthMessage = document.querySelector("#social-auth-message");
-  const supabaseClient = window.supabase?.createClient("https://gxxgjkqmagkqqindihes.supabase.co", "sb_publishable_MQ_31skTckUXUuGzRsSSGg_wqxGpSwD");
+  const supabaseUrl = "https://gxxgjkqmagkqqindihes.supabase.co";
+  const supabaseAnonKey = "sb_publishable_MQ_31skTckUXUuGzRsSSGg_wqxGpSwD";
+  const supabaseClient = window.supabase && supabaseUrl && supabaseAnonKey
+    ? window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    })
+    : null;
   const accountTypeCards = Array.from(document.querySelectorAll("[data-account-type]"));
   const creatorView = document.querySelector("#creator-view");
   const browseView = document.querySelector("#browse-view");
@@ -750,15 +760,15 @@
     const roleLabel = selectedAccountType === "creator" ? "creator" : "listener";
     document.querySelector("#auth-title").textContent = isSignUp
       ? `Create your ${roleLabel} account.`
-      : `Log in as a ${roleLabel}.`;
+      : `Sign in with your ${roleLabel} account.`;
     document.querySelector("#auth-description").textContent = selectedAccountType === "creator"
-      ? "Creator accounts can upload songs, add radio stations, and view audience activity."
-      : "Listener accounts can explore music, play songs, follow artists, and listen to live radio.";
-    document.querySelector("#auth-kicker").textContent = isSignUp ? "Create account" : "Log in";
+      ? "Use the email and password for an existing Creator account, or create one first to continue."
+      : "Use the email and password for an existing Lox-Muzik account before continuing.";
+    document.querySelector("#auth-kicker").textContent = isSignUp ? "Create account" : "Sign in";
     loginForm.elements.namedItem("password").autocomplete = isSignUp ? "new-password" : "current-password";
     document.querySelector(".auth-submit").textContent = isSignUp
       ? `Create ${roleLabel} account`
-      : `Continue as ${roleLabel}`;
+      : `Sign in to ${roleLabel} account`;
     document.querySelector("#signup-copy").textContent = isSignUp ? "Already have an account?" : "New to Lox-Muzik?";
     document.querySelector("#signup-toggle").textContent = isSignUp ? "Log in" : "Create an account";
   };
@@ -3639,8 +3649,15 @@
     }
   });
 
-  const completeLogin = () => {
-    const email = String(new FormData(loginForm).get("email") || "").trim().toLocaleLowerCase();
+  const getAuthRedirectUrl = () => {
+    const location = new URL(window.location.href);
+    location.hash = "";
+    location.search = "";
+    return location.origin + location.pathname;
+  };
+
+  const completeLogin = (emailOverride = "") => {
+    const email = String(emailOverride || new FormData(loginForm).get("email") || "").trim().toLocaleLowerCase();
     if (!email || !loginForm.reportValidity()) return;
     clearProfilePhotoPreview();
     isLoggedIn = true;
@@ -3680,7 +3697,14 @@
     );
   };
 
-  const logOut = () => {
+  const logOut = async () => {
+    if (supabaseClient) {
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : "Could not sign out from Supabase.");
+      }
+    }
     isLoggedIn = false;
     currentRole = null;
     accountEmail = "";
@@ -3766,7 +3790,9 @@
     if (socialAuthMessage) socialAuthMessage.textContent = "Opening " + (provider === "google" ? "Google" : "Apple") + " sign-in…";
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: window.location.href }
+      options: {
+        redirectTo: getAuthRedirectUrl(),
+      },
     });
     if (error && socialAuthMessage) socialAuthMessage.textContent = error.message;
   };
@@ -3783,14 +3809,60 @@
       if (data.session?.user?.email && !isLoggedIn) completeLogin(data.session.user.email);
     });
     supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session?.user?.email && !isLoggedIn) completeLogin(session.user.email);
-      if (event === "SIGNED_OUT" && isLoggedIn) logOut();
+      if ((event === "INITIAL_SESSION" || event === "SIGNED_IN") && session?.user?.email && !isLoggedIn) {
+        completeLogin(session.user.email);
+      }
+      if (event === "SIGNED_OUT" && isLoggedIn) {
+        logOut();
+      }
     });
   }
 
-  loginForm.addEventListener("submit", (event) => {
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    completeLogin();
+    if (!supabaseClient) {
+      showToast("Supabase authentication is not available. Refresh the app and try again.");
+      return;
+    }
+
+    const email = String(loginForm.elements.namedItem("email")?.value || "").trim().toLowerCase();
+    const password = String(loginForm.elements.namedItem("password")?.value || "");
+    if (!email || !password || !loginForm.reportValidity()) return;
+
+    try {
+      const request = isSignUp
+        ? supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: getAuthRedirectUrl(),
+          },
+        })
+        : supabaseClient.auth.signInWithPassword({ email, password });
+
+      const { data, error } = await request;
+      if (error) {
+        if (!isSignUp) {
+          showToast("No account matches that email and password. Use the correct email or create an account first.");
+        } else {
+          showToast(error.message || "Could not create your account.");
+        }
+        return;
+      }
+
+      if (isSignUp) {
+        showToast("Account created. Check your email to confirm it before signing in.");
+        isSignUp = false;
+        syncAuthControls();
+        return;
+      }
+
+      if (data.session?.user?.email) {
+        completeLogin(data.session.user.email);
+      }
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Authentication failed. Please try again.");
+    }
   });
   accountTypeCards.forEach((button) => {
     button.addEventListener("click", () => {

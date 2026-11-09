@@ -1,4 +1,4 @@
-const CACHE_NAME = "lox-muzik-shell-v37";
+const CACHE_NAME = "lox-muzik-shell-v44";
 const APP_SHELL = [
   "./index.html",
   "./style.css",

@@ -2,7 +2,7 @@
   const authPage = document.querySelector("#auth-page");
   const appShell = document.querySelector("#app-shell");
   const menuLoginButton = document.querySelector("#menu-login-button");
-  const topLoginButton = document.querySelector("#top-login-button");
+  const topProfileButton = document.querySelector("#top-profile-button");
   const loginForm = document.querySelector("#login-form");
   const socialAuthMessage = document.querySelector("#social-auth-message");
   const supabaseClient = window.supabase?.createClient("https://gxxgjkqmagkqqindihes.supabase.co", "sb_publishable_MQ_31skTckUXUuGzRsSSGg_wqxGpSwD");
@@ -38,6 +38,15 @@
   const settingsAccountName = document.querySelector("#settings-account-name");
   const settingsAccountEmail = document.querySelector("#settings-account-email");
   const settingsAccountRole = document.querySelector("#settings-account-role");
+  const accountProfileView = document.querySelector("#account-profile-view");
+  const accountProfileAvatar = document.querySelector("#account-profile-avatar");
+  const accountProfileName = document.querySelector("#account-profile-name");
+  const accountProfileEmail = document.querySelector("#account-profile-email");
+  const accountProfileRole = document.querySelector("#account-profile-role");
+  const accountProfileBackButton = document.querySelector("#account-profile-back");
+  const accountProfileSettingsButton = document.querySelector("#account-profile-settings");
+  const accountProfileArtistButton = document.querySelector("#account-profile-artist");
+  const accountProfileLogoutButton = document.querySelector("#account-profile-logout");
   const deleteAccountButton = document.querySelector("#delete-account-button");
   const crossfadeToggle = document.querySelector("#crossfade-toggle");
   const crossfadeDuration = document.querySelector("#crossfade-duration");
@@ -49,6 +58,7 @@
   let isLoggedIn = false;
   let currentRole = null;
   let isArtistProfileEditing = false;
+  let profileReturnView = "browse";
   let accountEmail = "";
   let creatorName = "";
   let selectedAccountType = "listener";
@@ -761,15 +771,17 @@
   };
 
   const updateLoginButtons = () => {
-    const label = isLoggedIn ? "Log out" : "Log in";
+    const menuLabel = isLoggedIn ? "Log out" : "Log in";
     if (menuLoginButton) {
-      menuLoginButton.innerHTML = '<span class="nav-icon" aria-hidden="true">◎</span> ' + label;
+      menuLoginButton.innerHTML = '<span class="nav-icon" aria-hidden="true">◎</span> ' + menuLabel;
     }
-    if (topLoginButton) {
-      topLoginButton.querySelector(".profile-button-label").textContent = label;
-      const accessibleLabel = isLoggedIn ? `${currentRole === "creator" ? "Creator" : "Listener"} account, log out` : "Log in";
-      topLoginButton.setAttribute("aria-label", accessibleLabel);
-      topLoginButton.title = accessibleLabel;
+    if (topProfileButton) {
+      topProfileButton.querySelector(".profile-button-label").textContent = "Profile";
+      const accessibleLabel = isLoggedIn
+        ? `${currentRole === "creator" ? "Creator" : "Listener"} account profile`
+        : "Profile";
+      topProfileButton.setAttribute("aria-label", accessibleLabel);
+      topProfileButton.title = accessibleLabel;
     }
     const username = accountEmail.split("@")[0].replace(/[._-]+/g, " ").trim();
     const displayName = currentRole === "creator" ? creatorName : username;
@@ -781,6 +793,15 @@
     settingsAccountRole.textContent = isLoggedIn
       ? currentRole === "creator" ? "Creator" : "Listener"
       : "Guest";
+    accountProfileAvatar.textContent = isLoggedIn
+      ? displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0].toLocaleUpperCase()).join("")
+      : "♫";
+    accountProfileName.textContent = isLoggedIn ? displayName || accountEmail : "Not signed in";
+    accountProfileEmail.textContent = isLoggedIn ? accountEmail : "Sign in to view your account";
+    accountProfileRole.textContent = isLoggedIn
+      ? currentRole === "creator" ? "Creator" : "Listener"
+      : "Guest";
+    accountProfileArtistButton.hidden = !isLoggedIn || currentRole !== "creator";
     deleteAccountButton.disabled = !isLoggedIn;
   };
 
@@ -2089,6 +2110,7 @@
     const isBrowseView = activeView === "browse" || activeView === "playlists";
     const isTrendsView = activeView === "trends";
     const isSettingsView = activeView === "settings";
+    const isAccountProfileView = activeView === "account-profile" && isLoggedIn;
     const homeSections = [
       document.querySelector(".popular-artists-section"),
       document.querySelector(".trending-section"),
@@ -2107,6 +2129,7 @@
     downloadsView.hidden = !isDownloadsView;
     radioView.hidden = !isRadioView;
     settingsView.hidden = !isSettingsView;
+    accountProfileView.hidden = !isAccountProfileView;
     settingsButton.setAttribute("aria-expanded", String(isSettingsView));
     creatorView.hidden = !isCreatorView;
     document.querySelector("#artist-profile-view").hidden = !isArtistProfileView;
@@ -3135,6 +3158,7 @@
   const setView = (view, artistName = null) => {
     if (view === "creator" && !requireCreator("open Creator Studio")) return;
     if (view === "profile" && !requireCreator("open your artist profile")) return;
+    if (view === "account-profile" && !requireLogin("open your profile")) return;
     if (view === "downloads" && !requireLogin("open your downloads")) return;
     if (isLoggedIn && currentRole === "creator"
       && (["playlists", "songs", "albums", "artists", "likes"].includes(view)
@@ -3666,7 +3690,7 @@
       keepScreenAwake.lock = null;
     }
     updateLoginButtons();
-    if (activeView === "creator" || activeView === "profile") setView("browse");
+    if (activeView === "creator" || activeView === "profile" || activeView === "account-profile") setView("browse");
     else render();
     showToast("Logged out.");
   };
@@ -3786,13 +3810,10 @@
     isSignUp = false;
     showAuthPage("listener");
   });
-  topLoginButton.addEventListener("click", () => {
-    if (isLoggedIn) {
-      logOut();
-      return;
-    }
-    isSignUp = false;
-    showAuthPage("listener");
+  topProfileButton.addEventListener("click", () => {
+    if (isLoggedIn && activeView !== "account-profile") profileReturnView = activeView;
+    setView("account-profile");
+    if (isLoggedIn) window.scrollTo({ top: 0, behavior: "smooth" });
   });
   settingsButton.addEventListener("click", () => {
     if (activeView === "settings") {
@@ -3806,6 +3827,16 @@
   settingsBackButton.addEventListener("click", () => {
     setView(settingsReturnView);
   });
+  accountProfileBackButton.addEventListener("click", () => {
+    setView(profileReturnView);
+  });
+  accountProfileSettingsButton.addEventListener("click", () => {
+    settingsReturnView = activeView;
+    setView("settings");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  accountProfileArtistButton.addEventListener("click", () => setView("profile"));
+  accountProfileLogoutButton.addEventListener("click", logOut);
   notificationsButton.addEventListener("click", () => {
     toggleTopbarPanel(notificationsButton, notificationsPanel);
     if (!notificationsPanel.hidden) markCreatorNotificationsRead();
@@ -3826,6 +3857,7 @@
     if (event.key !== "Escape") return;
     closeTopbarPanels();
     if (activeView === "settings") setView(settingsReturnView);
+    if (activeView === "account-profile") setView(profileReturnView);
   });
   welcomeSlideDots.forEach((button) => {
     button.addEventListener("click", () => setWelcomeSlide(Number(button.dataset.welcomeSlide)));
@@ -4111,7 +4143,7 @@
   });
   elements.songNowShuffle.addEventListener("click", () => {
     const ids = getReleaseTracks().map((track) => track.id);
-    for (let i = ids.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+    for (let i = ids.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1));[ids[i], ids[j]] = [ids[j], ids[i]]; }
     if (ids.length) selectTrack(ids[0], true, ids);
   });
   document.querySelector("#previous-button").addEventListener("click", () => moveTrack(-1));

@@ -50,6 +50,35 @@
   const creatorSongTitle = document.querySelector("#creator-song-title");
   const creatorSongArtist = document.querySelector("#creator-song-artist");
   const creatorProfilePhotoInput = document.querySelector("#creator-profile-photo");
+  const buildSongStoragePath = (email, filename) => {
+    const safeEmail = String(email || "anonymous").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "anonymous";
+    const safeName = String(filename || "untitled-song").replace(/\\/g, "/").split("/").pop().replace(/[^a-zA-Z0-9._-]+/g, "-");
+    return `${safeEmail}/${Date.now()}-${safeName}`;
+  };
+  const uploadSongToSupabaseStorage = async (file, email, bucketName) => {
+    if (!supabaseClient || !bucketName || !file) return null;
+    const path = buildSongStoragePath(email, file.name);
+    const { error } = await supabaseClient.storage.from(bucketName).upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type || "application/octet-stream",
+    });
+    if (error) throw error;
+    const { data } = supabaseClient.storage.from(bucketName).getPublicUrl(path);
+    return data?.publicUrl || null;
+  };
+  const publishSongToSupabase = async (payload) => {
+    if (!supabaseClient) return null;
+    const { data, error } = await supabaseClient.from("songs").insert([payload]).select().single();
+    if (error) throw error;
+    return data;
+  };
+   const loadSupabaseSongs = async () => {
+    if (!supabaseClient || !accountEmail) return [];
+    const { data, error } = await supabaseClient.from("songs").select("*").eq("owner_email", accountEmail).order("created_at", { ascending: false });
+    if (error) return [];
+    return Array.isArray(data) ? data : [];
+  };
   const creatorProfilePhotoRemove = document.querySelector("#creator-profile-photo-remove");
   const settingsAccountAvatar = document.querySelector("#settings-account-avatar");
   const settingsAccountName = document.querySelector("#settings-account-name");
@@ -3636,8 +3665,13 @@
 
     const title = creatorSongTitle.value.trim();
     const artist = creatorSongArtist.value.trim();
+    const copyrightConfirmed = creatorSongForm.querySelector('input[name="copyrightConfirm"]')?.checked;
     if (!title || !artist) {
       showToast("Add the song title and artist name before publishing.");
+      return;
+    }
+    if (!copyrightConfirmed) {
+      showToast("Please confirm that you own this song or have permission to upload it.");
       return;
     }
     if (tracks.some((track) => track.ownerEmail === accountEmail && track.fileName === file.name && track.size === file.size)) {
@@ -3658,7 +3692,50 @@
     submitButton.textContent = "Publishing…";
     try {
       const embeddedCover = coverFile ? null : await readEmbeddedCover(file);
-      tracks.push({
+      let audioUrl = URL.createObjectURL(file);
+      let coverUrl = coverFile ? URL.createObjectURL(coverFile) : embeddedCover;
+
+      if (supabaseClient) {
+        try {
+          const [audioResult, coverResult] = await Promise.all([
+            uploadSongToSupabaseStorage(file, accountEmail, "music-files"),
+            coverFile ? uploadSongToSupabaseStorage(coverFile, accountEmail, "artist-covers") : Promise.resolve(null),
+          ]);
+          if (audioResult) audioUrl = audioResult;
+          if (coverResult) coverUrl = coverResult;
+          const songInsert = {
+            title,
+            artist,
+            artist_names: splitArtistCredits(artist),
+            owner_email: accountEmail,
+            upload_source: "web",
+            file_name: file.name,
+            audio_url: audioUrl,
+            cover_url: coverUrl,
+            release_type: (() => {
+              const selectedReleaseType = String(creatorFormData.get("releaseType") || "single");
+              if (selectedReleaseType === "mix") return "mix";
+              if (selectedReleaseType === "album") return "album";
+              return "single";
+            })(),
+            genre: creatorFormData.get("genre") === "auto" ? null : creatorFormData.get("genre"),
+            allow_streaming: creatorFormData.get("allowStreaming") !== "off",
+            allow_offline: creatorFormData.get("allowOffline") !== "off",
+            allow_download_to_phone: creatorFormData.get("allowDownloadToPhone") === "on",
+            allow_video_use: creatorFormData.get("allowVideoUse") === "on",
+            created_at: new Date().toISOString(),
+          };
+          const savedSong = await publishSongToSupabase(songInsert);
+          if (savedSong) {
+            audioUrl = savedSong.audio_url || audioUrl;
+            coverUrl = savedSong.cover_url || coverUrl;
+          }
+        } catch (storageError) {
+          showToast(storageError instanceof Error ? `Cloud upload failed, so this song was saved locally only: ${storageError.message}` : "Cloud upload failed, so this song was saved locally only.");
+        }
+      }
+
+      const newTrack = {
         id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
         title,
         artist,
@@ -3673,15 +3750,20 @@
           return "single";
         })(),
         genre: creatorFormData.get("genre") === "auto" ? "" : creatorFormData.get("genre"),
-        url: URL.createObjectURL(file),
+        url: audioUrl,
         duration: 0,
         liked: false,
         searches: 0,
         downloads: 0,
         plays: 0,
         art: tracks.length % 5,
-        coverUrl: coverFile ? URL.createObjectURL(coverFile) : embeddedCover,
-      });
+        coverUrl,
+        allowStreaming: creatorFormData.get("allowStreaming") !== "off",
+        allowOffline: creatorFormData.get("allowOffline") !== "off",
+        allowDownloadToPhone: creatorFormData.get("allowDownloadToPhone") === "on",
+        allowVideoUse: creatorFormData.get("allowVideoUse") === "on",
+      };
+      tracks.push(newTrack);
       creatorSongForm.reset();
       creatorSongArtist.value = creatorName;
       creatorSongArtist.dataset.autoArtist = creatorName;

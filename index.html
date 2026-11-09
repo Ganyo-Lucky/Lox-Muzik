@@ -704,6 +704,20 @@
               <small id="creator-cover-help">If omitted, embedded cover art is used; otherwise your artist image
                 appears.</small>
             </label>
+
+            <div class="field">
+              <span>Song permissions</span>
+              <label><input type="checkbox" name="allowStreaming" checked /> Allow Streaming</label>
+              <label><input type="checkbox" name="allowOffline" checked /> Allow Save Offline</label>
+              <label><input type="checkbox" name="allowDownloadToPhone" /> Allow Download to Phone</label>
+              <label><input type="checkbox" name="allowVideoUse" /> Allow Others to Use in Videos</label>
+            </div>
+
+            <label class="field">
+              <span>Copyright confirmation <b aria-hidden="true">*</b></span>
+              <label><input type="checkbox" name="copyrightConfirm" required /> I confirm that I own this song or have permission to upload and distribute it.</label>
+            </label>
+
             <button class="artist-play-button creator-song-submit" type="submit">＋ Publish song</button>
           </form>
         </section>

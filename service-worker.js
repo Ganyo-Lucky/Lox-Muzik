@@ -1,8 +1,8 @@
-const CACHE_NAME = "lox-muzik-shell-v44";
+const CACHE_NAME = "lox-muzik-shell-v49";
 const APP_SHELL = [
-  "./index.html",
-  "./style.css",
-  "./app.js",
+  "./index.html?v=password-recovery-2",
+  "./style.css?v=password-recovery-2",
+  "./app.js?v=password-recovery-2",
   "./songs/catalog.js",
   "./LOX-MUZIK_4000px_square.png",
   "./imgs/IMG-20261024-WA0040.jpg",
@@ -32,7 +32,7 @@ self.addEventListener("fetch", (event) => {
     if (cachedResponse) return cachedResponse;
     return fetch(request).catch((error) => {
       if (request.mode === "navigate") {
-        return caches.match("./index.html").then((offlinePage) => {
+        return caches.match("./index.html", { ignoreSearch: true }).then((offlinePage) => {
           if (offlinePage) return offlinePage;
           throw error;
         });

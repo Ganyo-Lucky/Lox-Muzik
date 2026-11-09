@@ -4,7 +4,14 @@
   const menuLoginButton = document.querySelector("#menu-login-button");
   const topProfileButton = document.querySelector("#top-profile-button");
   const loginForm = document.querySelector("#login-form");
+  const signupForm = document.querySelector("#signup-form");
+  const forgotPasswordForm = document.querySelector("#forgot-password-form");
+  const passwordRecoveryForm = document.querySelector("#password-recovery-form");
+  const authSocialOptions = document.querySelector("#auth-social-options");
+  const accountTypePicker = document.querySelector(".account-type-picker");
+  const authCard = document.querySelector(".auth-card");
   const socialAuthMessage = document.querySelector("#social-auth-message");
+  let authScreen = "login";
   const supabaseUrl = "https://gxxgjkqmagkqqindihes.supabase.co";
   const supabaseAnonKey = "sb_publishable_MQ_31skTckUXUuGzRsSSGg_wqxGpSwD";
   const supabaseClient = window.supabase && supabaseUrl && supabaseAnonKey
@@ -752,25 +759,63 @@
   };
 
   const syncAuthControls = () => {
+    const showLogin = authScreen === "login";
+    const showSignup = authScreen === "signup";
+    const showForgotPassword = authScreen === "forgot-password";
+    const showPasswordRecovery = authScreen === "password-recovery";
+    loginForm.hidden = !showLogin;
+    signupForm.hidden = !showSignup;
+    forgotPasswordForm.hidden = !showForgotPassword;
+    passwordRecoveryForm.hidden = !showPasswordRecovery;
+    authSocialOptions.hidden = showForgotPassword || showPasswordRecovery;
+    accountTypePicker.hidden = showForgotPassword || showPasswordRecovery;
+    authCard.classList.toggle("is-signup", showSignup);
+    authCard.classList.toggle("is-password-flow", showForgotPassword || showPasswordRecovery);
     accountTypeCards.forEach((button) => {
       const isSelected = button.dataset.accountType === selectedAccountType;
       button.classList.toggle("is-selected", isSelected);
       button.setAttribute("aria-pressed", String(isSelected));
     });
     const roleLabel = selectedAccountType === "creator" ? "creator" : "listener";
-    document.querySelector("#auth-title").textContent = isSignUp
-      ? `Create your ${roleLabel} account.`
-      : `Sign in with your ${roleLabel} account.`;
-    document.querySelector("#auth-description").textContent = selectedAccountType === "creator"
-      ? "Use the email and password for an existing Creator account, or create one first to continue."
-      : "Use the email and password for an existing Lox-Muzik account before continuing.";
-    document.querySelector("#auth-kicker").textContent = isSignUp ? "Create account" : "Sign in";
-    loginForm.elements.namedItem("password").autocomplete = isSignUp ? "new-password" : "current-password";
-    document.querySelector(".auth-submit").textContent = isSignUp
+    const authCopy = {
+      login: {
+        kicker: "Sign in",
+        title: `Sign in with your ${roleLabel} account.`,
+        description: selectedAccountType === "creator"
+          ? "Use the email and password for your existing Creator account."
+          : "Use the email and password for your existing Lox-Muzik account.",
+      },
+      signup: {
+        kicker: "Create account",
+        title: `Join Lox-Muzik as a ${roleLabel}.`,
+        description: `Create your ${roleLabel} profile with a few details. You can use it to ${selectedAccountType === "creator" ? "publish music and grow your audience" : "enjoy music and live radio"}.`,
+      },
+      "forgot-password": {
+        kicker: "Account recovery",
+        title: "Reset your password.",
+        description: "Enter the email address linked to your account and we’ll send you a secure reset link.",
+      },
+      "password-recovery": {
+        kicker: "Choose a new password",
+        title: "Make it a new one.",
+        description: "Choose a new password for your Lox-Muzik account.",
+      },
+    }[authScreen];
+    document.querySelector("#auth-kicker").textContent = authCopy.kicker;
+    document.querySelector("#auth-title").textContent = authCopy.title;
+    document.querySelector("#auth-description").textContent = authCopy.description;
+    loginForm.querySelector(".auth-submit").textContent = isSignUp
       ? `Create ${roleLabel} account`
       : `Sign in to ${roleLabel} account`;
-    document.querySelector("#signup-copy").textContent = isSignUp ? "Already have an account?" : "New to Lox-Muzik?";
-    document.querySelector("#signup-toggle").textContent = isSignUp ? "Log in" : "Create an account";
+    signupForm.querySelector(".auth-submit").textContent = `Create ${roleLabel} account`;
+    const footerCopy = {
+      login: ["New to Lox-Muzik?", "Create an account"],
+      signup: ["Already have an account?", "Log in"],
+      "forgot-password": ["Remembered your password?", "Back to sign in"],
+      "password-recovery": ["Already updated it?", "Back to sign in"],
+    }[authScreen];
+    document.querySelector("#signup-copy").textContent = footerCopy[0];
+    document.querySelector("#signup-toggle").textContent = footerCopy[1];
   };
 
   const showAuthPage = (role = selectedAccountType) => {
@@ -3655,10 +3700,16 @@
     location.search = "";
     return location.origin + location.pathname;
   };
+  const setAuthScreen = (screen) => {
+    authScreen = screen;
+    isSignUp = screen === "signup";
+    if (socialAuthMessage) socialAuthMessage.textContent = "";
+    syncAuthControls();
+  };
 
   const completeLogin = (emailOverride = "") => {
     const email = String(emailOverride || new FormData(loginForm).get("email") || "").trim().toLocaleLowerCase();
-    if (!email || !loginForm.reportValidity()) return;
+    if (!email || (!emailOverride && !loginForm.reportValidity())) return;
     clearProfilePhotoPreview();
     isLoggedIn = true;
     currentRole = selectedAccountType;
@@ -3684,6 +3735,7 @@
       }
       : { bio: "", location: "", genres: "", website: "", photoUrl: "" };
     isSignUp = false;
+    authScreen = "login";
     syncAuthControls();
     updateLoginButtons();
     if (authPage) authPage.classList.add("app-shell-hidden");
@@ -3809,6 +3861,12 @@
       if (data.session?.user?.email && !isLoggedIn) completeLogin(data.session.user.email);
     });
     supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthScreen("password-recovery");
+        if (authPage) authPage.classList.remove("app-shell-hidden");
+        if (appShell) appShell.classList.add("app-shell-hidden");
+        return;
+      }
       if ((event === "INITIAL_SESSION" || event === "SIGNED_IN") && session?.user?.email && !isLoggedIn) {
         completeLogin(session.user.email);
       }
@@ -3818,31 +3876,40 @@
     });
   }
 
-  loginForm.addEventListener("submit", async (event) => {
+  const submitAuthForm = async (event, form, signingUp) => {
     event.preventDefault();
     if (!supabaseClient) {
       showToast("Supabase authentication is not available. Refresh the app and try again.");
       return;
     }
 
-    const email = String(loginForm.elements.namedItem("email")?.value || "").trim().toLowerCase();
-    const password = String(loginForm.elements.namedItem("password")?.value || "");
-    if (!email || !password || !loginForm.reportValidity()) return;
+    const formData = new FormData(form);
+    const email = String(formData.get("email") || "").trim().toLowerCase();
+    const password = String(formData.get("password") || "");
+    if (signingUp) {
+      const confirmPassword = form.elements.namedItem("confirmPassword");
+      confirmPassword.setCustomValidity(password === confirmPassword.value ? "" : "Passwords do not match.");
+    }
+    if (!email || !password || !form.reportValidity()) return;
 
     try {
-      const request = isSignUp
+      const request = signingUp
         ? supabaseClient.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: getAuthRedirectUrl(),
+            data: {
+              display_name: String(formData.get("displayName") || "").trim(),
+              account_type: selectedAccountType,
+            },
           },
         })
         : supabaseClient.auth.signInWithPassword({ email, password });
 
       const { data, error } = await request;
       if (error) {
-        if (!isSignUp) {
+        if (!signingUp) {
           showToast("No account matches that email and password. Use the correct email or create an account first.");
         } else {
           showToast(error.message || "Could not create your account.");
@@ -3850,7 +3917,9 @@
         return;
       }
 
-      if (isSignUp) {
+      if (signingUp) {
+        loginForm.elements.namedItem("email").value = email;
+        form.reset();
         showToast("Account created. Check your email to confirm it before signing in.");
         isSignUp = false;
         syncAuthControls();
@@ -3863,6 +3932,79 @@
     } catch (error) {
       showToast(error instanceof Error ? error.message : "Authentication failed. Please try again.");
     }
+  };
+  loginForm.addEventListener("submit", (event) => submitAuthForm(event, loginForm, false));
+  signupForm.addEventListener("submit", (event) => submitAuthForm(event, signupForm, true));
+  forgotPasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!forgotPasswordForm.reportValidity()) return;
+    if (!supabaseClient) {
+      showToast("Supabase authentication is not available. Refresh the app and try again.");
+      return;
+    }
+
+    const email = String(new FormData(forgotPasswordForm).get("email") || "").trim().toLowerCase();
+    const submitButton = forgotPasswordForm.querySelector(".auth-submit");
+    submitButton.disabled = true;
+    submitButton.textContent = "Sending…";
+    try {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: getAuthRedirectUrl(),
+      });
+      if (error) throw error;
+      loginForm.elements.namedItem("email").value = email;
+      showToast("If an account exists for that email, a password reset link is on its way.");
+      setAuthScreen("login");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Could not send the password reset email.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Send reset link";
+    }
+  });
+  passwordRecoveryForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(passwordRecoveryForm);
+    const password = String(formData.get("password") || "");
+    const confirmPassword = passwordRecoveryForm.elements.namedItem("confirmPassword");
+    confirmPassword.setCustomValidity(password === confirmPassword.value ? "" : "Passwords do not match.");
+    if (!passwordRecoveryForm.reportValidity()) return;
+    if (!supabaseClient) {
+      showToast("Supabase authentication is not available. Refresh the app and try again.");
+      return;
+    }
+
+    const submitButton = passwordRecoveryForm.querySelector(".auth-submit");
+    submitButton.disabled = true;
+    submitButton.textContent = "Saving…";
+    try {
+      const { error } = await supabaseClient.auth.updateUser({ password });
+      if (error) throw error;
+      const { error: signOutError } = await supabaseClient.auth.signOut();
+      passwordRecoveryForm.reset();
+      setAuthScreen("login");
+      if (signOutError) {
+        showToast(`Password updated, but could not sign out: ${signOutError.message}`);
+        return;
+      }
+      showToast("Password updated. Sign in with your new password.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Could not update your password.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Save new password";
+    }
+  });
+  signupForm.elements.namedItem("confirmPassword").addEventListener("input", (event) => {
+    event.currentTarget.setCustomValidity("");
+  });
+  passwordRecoveryForm.elements.namedItem("confirmPassword").addEventListener("input", (event) => {
+    event.currentTarget.setCustomValidity("");
+  });
+  document.querySelector("#forgot-password-toggle").addEventListener("click", () => {
+    const loginEmail = loginForm.elements.namedItem("email").value.trim();
+    forgotPasswordForm.elements.namedItem("email").value = loginEmail.includes("@") ? loginEmail : "";
+    setAuthScreen("forgot-password");
   });
   accountTypeCards.forEach((button) => {
     button.addEventListener("click", () => {
@@ -3871,15 +4013,14 @@
     });
   });
   document.querySelector("#signup-toggle").addEventListener("click", () => {
-    isSignUp = !isSignUp;
-    syncAuthControls();
+    setAuthScreen(authScreen === "login" ? "signup" : "login");
   });
   menuLoginButton.addEventListener("click", () => {
     if (isLoggedIn) {
       logOut();
       return;
     }
-    isSignUp = false;
+    setAuthScreen("login");
     showAuthPage("listener");
   });
   topProfileButton.addEventListener("click", () => {

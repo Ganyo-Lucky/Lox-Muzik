@@ -188,6 +188,39 @@ input:focus-visible {
   gap: 16px;
 }
 
+.auth-form[hidden] {
+  display: none;
+}
+
+#auth-social-options[hidden],
+.account-type-picker[hidden] {
+  display: none;
+}
+
+.forgot-password-link {
+  justify-self: end;
+  margin: -4px 0 0;
+  color: #d778f2;
+  font-size: 13px;
+}
+
+.auth-card.is-signup {
+  border-color: rgba(203, 82, 238, 0.3);
+}
+
+.auth-card.is-password-flow {
+  border-color: rgba(203, 82, 238, 0.3);
+}
+
+.auth-card.is-signup .auth-kicker {
+  color: #d778f2;
+}
+
+.auth-card.is-signup .auth-submit {
+  background: linear-gradient(110deg, #c44ce5, #e65bbd);
+  color: #16091d;
+}
+
 .field {
   display: grid;
   gap: 8px;

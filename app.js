@@ -16,6 +16,23 @@
   const accountTypePicker = document.querySelector(".account-type-picker");
   const authCard = document.querySelector(".auth-card");
   const socialAuthMessage = document.querySelector("#social-auth-message");
+  const pendingAuthRoleStorageKey = "loxMuzikPendingAuthRole";
+  const readPendingAuthRole = () => {
+    try {
+      const role = window.sessionStorage.getItem(pendingAuthRoleStorageKey);
+      return role === "creator" || role === "listener" ? role : null;
+    } catch (error) {
+      console.error("Could not restore the selected account type after sign-in.", error);
+      return null;
+    }
+  };
+  const clearPendingAuthRole = () => {
+    try {
+      window.sessionStorage.removeItem(pendingAuthRoleStorageKey);
+    } catch (error) {
+      console.error("Could not clear the pending account type after sign-in.", error);
+    }
+  };
   let authScreen = "login";
   const supabaseUrl = "https://gxxgjkqmagkqqindihes.supabase.co";
   const supabaseAnonKey = "sb_publishable_MQ_31skTckUXUuGzRsSSGg_wqxGpSwD";
@@ -112,7 +129,7 @@
   let profileReturnView = "browse";
   let accountEmail = "";
   let creatorName = "";
-  let selectedAccountType = "listener";
+  let selectedAccountType = readPendingAuthRole() || "listener";
   let isSignUp = false;
   let audio = document.querySelector("#audio-player");
   let standbyAudio = document.querySelector("#crossfade-audio");
@@ -816,8 +833,8 @@
         kicker: "Sign in",
         title: `Sign in with your ${roleLabel} account.`,
         description: selectedAccountType === "creator"
-          ? "Use the email and password for your existing Creator account."
-          : "Use the email and password for your existing Lox-Muzik account.",
+          ? "Sign in with any Lox-Muzik account to open Creator Studio. You can also choose Listener to listen to music."
+          : "Sign in with any Lox-Muzik account to listen, including a Creator account. Choose Creator to open Creator Studio.",
       },
       signup: {
         kicker: "Create account",
@@ -3805,6 +3822,7 @@
   const completeLogin = (emailOverride = "") => {
     const email = String(emailOverride || new FormData(loginForm).get("email") || "").trim().toLocaleLowerCase();
     if (!email || (!emailOverride && !loginForm.reportValidity())) return;
+    clearPendingAuthRole();
     clearProfilePhotoPreview();
     isLoggedIn = true;
     currentRole = selectedAccountType;
@@ -3935,14 +3953,30 @@
       if (socialAuthMessage) socialAuthMessage.textContent = "Sign-in service is unavailable. Please refresh and try again.";
       return;
     }
+    try {
+      window.sessionStorage.setItem(pendingAuthRoleStorageKey, selectedAccountType);
+    } catch (error) {
+      console.error("Could not save the selected account type for sign-in.", error);
+      if (socialAuthMessage) socialAuthMessage.textContent = "Your account choice could not be saved. Check your browser storage settings and try again.";
+      return;
+    }
     if (socialAuthMessage) socialAuthMessage.textContent = "Opening " + (provider === "google" ? "Google" : "Apple") + " sign-in…";
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: getAuthRedirectUrl(),
-      },
-    });
-    if (error && socialAuthMessage) socialAuthMessage.textContent = error.message;
+    try {
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: getAuthRedirectUrl(),
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      clearPendingAuthRole();
+      if (socialAuthMessage) {
+        socialAuthMessage.textContent = error instanceof Error
+          ? error.message
+          : "Could not start social sign-in. Please try again.";
+      }
+    }
   };
 
   document.querySelector("#google-auth-button")?.addEventListener("click", () => beginSocialAuth("google"));
@@ -3955,7 +3989,7 @@
         return;
       }
       if (data.session?.user?.email && !isLoggedIn) {
-        const accountType = data.session.user.user_metadata?.account_type;
+        const accountType = readPendingAuthRole() || data.session.user.user_metadata?.account_type;
         if (accountType === "creator" || accountType === "listener") selectedAccountType = accountType;
         completeLogin(data.session.user.email);
       }
@@ -3969,7 +4003,7 @@
         return;
       }
       if ((event === "INITIAL_SESSION" || event === "SIGNED_IN") && session?.user?.email && !isLoggedIn) {
-        const accountType = session.user.user_metadata?.account_type;
+        const accountType = readPendingAuthRole() || session.user.user_metadata?.account_type;
         if (accountType === "creator" || accountType === "listener") selectedAccountType = accountType;
         completeLogin(session.user.email);
       }

@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=password-recovery-2" />
+  <link rel="stylesheet" href="style.css?v=email-confirmation-1" />
 </head>
 
 <body>
@@ -115,6 +115,26 @@
       </p>
     </div>
   </div>
+
+  <section id="email-confirmation-page" class="email-confirmation-page app-shell-hidden" aria-labelledby="email-confirmation-title">
+    <div class="email-confirmation-card">
+      <div class="email-confirmation-icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <rect x="7" y="14" width="50" height="36" rx="8" stroke="currentColor" stroke-width="3" />
+          <path d="m11 19 21 17 21-17" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="49" cy="47" r="11" fill="#17101d" stroke="currentColor" stroke-width="3" />
+          <path d="M49 41v7l4 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <p class="email-confirmation-kicker">One last step</p>
+      <h1 id="email-confirmation-title" tabindex="-1">Check your inbox</h1>
+      <p class="email-confirmation-copy">We sent a confirmation link to</p>
+      <strong id="email-confirmation-address" class="email-confirmation-address"></strong>
+      <p class="email-confirmation-instructions">Open the email and select <strong>Confirm your email</strong>. Keep this page open; once your email is confirmed, we’ll take you straight to Lox-Muzik.</p>
+      <p id="email-confirmation-status" class="email-confirmation-status" role="status" aria-live="polite"></p>
+      <button id="resend-confirmation-button" class="primary-button email-confirmation-resend" type="button">Resend confirmation email</button>
+    </div>
+  </section>
 
   <div class="app-shell app-shell-hidden" id="app-shell">
     <aside class="sidebar" aria-label="Main navigation">
@@ -1233,7 +1253,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="songs/catalog.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=email-login-1"></script>
+  <script src="app.js?v=email-confirmation-1"></script>
 </body>
 
 </html>

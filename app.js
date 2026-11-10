@@ -1,5 +1,10 @@
 (() => {
   const authPage = document.querySelector("#auth-page");
+  const emailConfirmationPage = document.querySelector("#email-confirmation-page");
+  const emailConfirmationTitle = document.querySelector("#email-confirmation-title");
+  const emailConfirmationAddress = document.querySelector("#email-confirmation-address");
+  const emailConfirmationStatus = document.querySelector("#email-confirmation-status");
+  const resendConfirmationButton = document.querySelector("#resend-confirmation-button");
   const appShell = document.querySelector("#app-shell");
   const menuLoginButton = document.querySelector("#menu-login-button");
   const topProfileButton = document.querySelector("#top-profile-button");
@@ -3788,6 +3793,14 @@
     if (socialAuthMessage) socialAuthMessage.textContent = "";
     syncAuthControls();
   };
+  const showEmailConfirmation = (email) => {
+    emailConfirmationAddress.textContent = email;
+    emailConfirmationStatus.textContent = "";
+    authPage.classList.add("app-shell-hidden");
+    emailConfirmationPage.classList.remove("app-shell-hidden");
+    appShell.classList.add("app-shell-hidden");
+    emailConfirmationTitle.focus();
+  };
 
   const completeLogin = (emailOverride = "") => {
     const email = String(emailOverride || new FormData(loginForm).get("email") || "").trim().toLocaleLowerCase();
@@ -3821,6 +3834,7 @@
     syncAuthControls();
     updateLoginButtons();
     if (authPage) authPage.classList.add("app-shell-hidden");
+    if (emailConfirmationPage) emailConfirmationPage.classList.add("app-shell-hidden");
     if (appShell) appShell.classList.remove("app-shell-hidden");
     if (currentRole === "creator") setView("creator");
     else if (activeView === "creator" || activeView === "profile") setView("browse");
@@ -3940,16 +3954,23 @@
         if (socialAuthMessage) socialAuthMessage.textContent = error.message;
         return;
       }
-      if (data.session?.user?.email && !isLoggedIn) completeLogin(data.session.user.email);
+      if (data.session?.user?.email && !isLoggedIn) {
+        const accountType = data.session.user.user_metadata?.account_type;
+        if (accountType === "creator" || accountType === "listener") selectedAccountType = accountType;
+        completeLogin(data.session.user.email);
+      }
     });
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
         setAuthScreen("password-recovery");
         if (authPage) authPage.classList.remove("app-shell-hidden");
+        if (emailConfirmationPage) emailConfirmationPage.classList.add("app-shell-hidden");
         if (appShell) appShell.classList.add("app-shell-hidden");
         return;
       }
       if ((event === "INITIAL_SESSION" || event === "SIGNED_IN") && session?.user?.email && !isLoggedIn) {
+        const accountType = session.user.user_metadata?.account_type;
+        if (accountType === "creator" || accountType === "listener") selectedAccountType = accountType;
         completeLogin(session.user.email);
       }
       if (event === "SIGNED_OUT" && isLoggedIn) {
@@ -4006,9 +4027,16 @@
       if (signingUp) {
         loginForm.elements.namedItem("email").value = email;
         form.reset();
-        showToast("Account created. Check your email to confirm it before signing in.");
-        isSignUp = false;
-        syncAuthControls();
+        if (data.session?.user?.email) {
+          completeLogin(data.session.user.email);
+        } else if (data.user?.email && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          setAuthScreen("login");
+          showToast("If an account exists for this email, check your inbox for a confirmation link or sign in with the method you used before.");
+        } else if (data.user?.email) {
+          showEmailConfirmation(data.user.email);
+        } else {
+          showToast("Account creation returned no confirmation details. Try signing in or create the account again.");
+        }
         return;
       }
 
@@ -4021,6 +4049,32 @@
   };
   loginForm.addEventListener("submit", (event) => submitAuthForm(event, loginForm, false));
   signupForm.addEventListener("submit", (event) => submitAuthForm(event, signupForm, true));
+  resendConfirmationButton.addEventListener("click", async () => {
+    if (!supabaseClient) {
+      emailConfirmationStatus.textContent = "The sign-in service is unavailable. Refresh the page and try again.";
+      return;
+    }
+
+    resendConfirmationButton.disabled = true;
+    resendConfirmationButton.textContent = "Sending…";
+    emailConfirmationStatus.textContent = "";
+    try {
+      const { error } = await supabaseClient.auth.resend({
+        type: "signup",
+        email: emailConfirmationAddress.textContent,
+        options: { emailRedirectTo: getAuthRedirectUrl() },
+      });
+      if (error) throw error;
+      emailConfirmationStatus.textContent = "If this address is eligible, a new confirmation email is on its way.";
+    } catch (error) {
+      emailConfirmationStatus.textContent = error instanceof Error
+        ? error.message
+        : "Could not resend the confirmation email. Please try again.";
+    } finally {
+      resendConfirmationButton.disabled = false;
+      resendConfirmationButton.textContent = "Resend confirmation email";
+    }
+  });
   forgotPasswordForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!forgotPasswordForm.reportValidity()) return;

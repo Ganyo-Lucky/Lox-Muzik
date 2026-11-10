@@ -3992,7 +3992,11 @@
       const { data, error } = await request;
       if (error) {
         if (!signingUp) {
-          showToast("No account matches that email and password. Use the correct email or create an account first.");
+          const errorCode = String(error.code || "").toLowerCase();
+          const errorMessage = String(error.message || "").toLowerCase();
+          showToast(errorCode === "email_not_confirmed" || errorMessage.includes("email not confirmed")
+            ? "Confirm your email using the link we sent when you created your account, then try signing in again."
+            : "Enter the exact email used to create the account. If you signed up with Google, choose Continue with Google. Forgot your password? Use Forgot password? to reset it.");
         } else {
           showToast(error.message || "Could not create your account.");
         }

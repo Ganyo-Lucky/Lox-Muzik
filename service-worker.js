@@ -1,8 +1,8 @@
-const CACHE_NAME = "lox-muzik-shell-v49";
+const CACHE_NAME = "lox-muzik-shell-v50";
 const APP_SHELL = [
-  "./index.html?v=password-recovery-2",
+  "./index.html?v=email-login-1",
   "./style.css?v=password-recovery-2",
-  "./app.js?v=password-recovery-2",
+  "./app.js?v=email-login-1",
   "./songs/catalog.js",
   "./LOX-MUZIK_4000px_square.png",
   "./imgs/IMG-20261024-WA0040.jpg",

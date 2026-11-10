@@ -26,6 +26,19 @@
       return null;
     }
   };
+  const readEmailConfirmationRole = () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("email_confirmation") !== "1") return null;
+    const role = params.get("account_type");
+    return role === "creator" || role === "listener" ? role : null;
+  };
+  const clearEmailConfirmationParams = () => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("email_confirmation") !== "1") return;
+    url.searchParams.delete("email_confirmation");
+    url.searchParams.delete("account_type");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search);
+  };
   const clearPendingAuthRole = () => {
     try {
       window.sessionStorage.removeItem(pendingAuthRoleStorageKey);
@@ -129,7 +142,8 @@
   let profileReturnView = "browse";
   let accountEmail = "";
   let creatorName = "";
-  let selectedAccountType = readPendingAuthRole() || "listener";
+  let selectedAccountType = readEmailConfirmationRole() || readPendingAuthRole() || "listener";
+  let pendingSignupRole = null;
   let isSignUp = false;
   let audio = document.querySelector("#audio-player");
   let standbyAudio = document.querySelector("#crossfade-audio");
@@ -3804,6 +3818,12 @@
     location.search = "";
     return location.origin + location.pathname;
   };
+  const getEmailConfirmationRedirectUrl = (role) => {
+    const location = new URL(getAuthRedirectUrl());
+    location.searchParams.set("email_confirmation", "1");
+    location.searchParams.set("account_type", role);
+    return location.toString();
+  };
   const setAuthScreen = (screen) => {
     authScreen = screen;
     isSignUp = screen === "signup";
@@ -3822,6 +3842,12 @@
   const completeLogin = (emailOverride = "") => {
     const email = String(emailOverride || new FormData(loginForm).get("email") || "").trim().toLocaleLowerCase();
     if (!email || (!emailOverride && !loginForm.reportValidity())) return;
+    const confirmedAccountType = readEmailConfirmationRole() || pendingSignupRole;
+    if (confirmedAccountType === "creator" || confirmedAccountType === "listener") {
+      selectedAccountType = confirmedAccountType;
+    }
+    pendingSignupRole = null;
+    clearEmailConfirmationParams();
     clearPendingAuthRole();
     clearProfilePhotoPreview();
     isLoggedIn = true;
@@ -3989,7 +4015,10 @@
         return;
       }
       if (data.session?.user?.email && !isLoggedIn) {
-        const accountType = readPendingAuthRole() || data.session.user.user_metadata?.account_type;
+        const accountType = readEmailConfirmationRole()
+          || pendingSignupRole
+          || readPendingAuthRole()
+          || data.session.user.user_metadata?.account_type;
         if (accountType === "creator" || accountType === "listener") selectedAccountType = accountType;
         completeLogin(data.session.user.email);
       }
@@ -4003,7 +4032,10 @@
         return;
       }
       if ((event === "INITIAL_SESSION" || event === "SIGNED_IN") && session?.user?.email && !isLoggedIn) {
-        const accountType = readPendingAuthRole() || session.user.user_metadata?.account_type;
+        const accountType = readEmailConfirmationRole()
+          || pendingSignupRole
+          || readPendingAuthRole()
+          || session.user.user_metadata?.account_type;
         if (accountType === "creator" || accountType === "listener") selectedAccountType = accountType;
         completeLogin(session.user.email);
       }
@@ -4035,7 +4067,7 @@
           email,
           password,
           options: {
-            emailRedirectTo: getAuthRedirectUrl(),
+            emailRedirectTo: getEmailConfirmationRedirectUrl(selectedAccountType),
             data: {
               display_name: String(formData.get("displayName") || "").trim(),
               account_type: selectedAccountType,
@@ -4061,6 +4093,7 @@
       if (signingUp) {
         loginForm.elements.namedItem("email").value = email;
         form.reset();
+        pendingSignupRole = selectedAccountType;
         if (data.session?.user?.email) {
           completeLogin(data.session.user.email);
         } else if (data.user?.email && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -4096,7 +4129,7 @@
       const { error } = await supabaseClient.auth.resend({
         type: "signup",
         email: emailConfirmationAddress.textContent,
-        options: { emailRedirectTo: getAuthRedirectUrl() },
+        options: { emailRedirectTo: getEmailConfirmationRedirectUrl(selectedAccountType) },
       });
       if (error) throw error;
       emailConfirmationStatus.textContent = "If this address is eligible, a new confirmation email is on its way.";
